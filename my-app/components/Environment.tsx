@@ -1,5 +1,3 @@
-import * as THREE from "three"
-
 export function Environment() {
   return (
     <group>

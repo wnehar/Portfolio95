@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { PointerLockControls } from "@react-three/drei"
+import type { PointerLockControls as PointerLockControlsImpl } from "three-stdlib"
 import * as THREE from "three"
 
 const keys = { 
@@ -48,7 +49,7 @@ export const usePlayerControls = () => {
 
 export function Player() {
   const { forward, backward, left, right } = usePlayerControls()
-  const controlsRef = useRef<any>(null)
+  const controlsRef = useRef<PointerLockControlsImpl | null>(null)
   
   const direction = useRef(new THREE.Vector3())
   const speed = 10.0 // units per second

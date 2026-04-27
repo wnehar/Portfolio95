@@ -5,11 +5,15 @@ import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { Sparks } from "./Sparks"
 
+export type TargetKey = "about" | "skills" | "contact"
+
 interface TargetProps {
   position: [number, number, number]
+  targetKey: TargetKey
+  onFallen?: (targetKey: TargetKey) => void
 }
 
-export function Target({ position }: TargetProps) {
+export function Target({ position, targetKey, onFallen }: TargetProps) {
   const groupRef = useRef<THREE.Group>(null)
   const [isHit, setIsHit] = useState(false)
   const [impactPoint, setImpactPoint] = useState<THREE.Vector3 | null>(null)
@@ -31,6 +35,7 @@ export function Target({ position }: TargetProps) {
   const handleHit = (point: THREE.Vector3) => {
     if (!isHit) {
       setIsHit(true)
+      onFallen?.(targetKey)
       // On sauvegarde le point d'impact (dans l'espace monde) pour générer les étincelles
       // Comme la Target elle-même va pivoter, on pourrait vouloir placer les étincelles globalement
       // Mais comme elles disparaissent vite, on peut simplement les attacher à la scène via le Player
@@ -65,7 +70,7 @@ export function Target({ position }: TargetProps) {
           rotation={[Math.PI / 2, 0, 0]} 
           castShadow 
           receiveShadow
-          userData={{ isTarget: true, onHit: handleHit }}
+          userData={{ isTarget: true, targetKey, onHit: handleHit }}
         >
           {/* Main red circle */}
           <cylinderGeometry args={[0.8, 0.8, 0.1, 32]} />

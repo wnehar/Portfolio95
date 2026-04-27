@@ -93,10 +93,14 @@ function WeaponShooter({
   weapon,
   recoilDebtRef,
   recoilReturnSpeedRef,
+  onShot,
+  onHit,
 }: {
   weapon: WeaponKey
   recoilDebtRef: React.MutableRefObject<number>
   recoilReturnSpeedRef: React.MutableRefObject<number>
+  onShot?: () => void
+  onHit?: () => void
 }) {
   const { camera, scene } = useThree()
   const raycasterRef = useRef(new THREE.Raycaster())
@@ -119,6 +123,7 @@ function WeaponShooter({
       camera.position.addScaledVector(dir, -weaponConfig.recoilKick)
       recoilDebtRef.current += weaponConfig.recoilKick
       recoilReturnSpeedRef.current = weaponConfig.recoilReturnSpeed
+      onShot?.()
 
       // Sound (best-effort)
       play(weaponConfig.sound.type, weaponConfig.sound.gain)
@@ -127,9 +132,12 @@ function WeaponShooter({
       raycasterRef.current.setFromCamera(ndc, camera)
       const intersects = raycasterRef.current.intersectObjects(scene.children, true)
       const hit = intersects.find((i) => i.object?.userData?.isTarget && typeof i.object.userData.onHit === "function")
-      if (hit) hit.object.userData.onHit(hit.point as THREE.Vector3)
+      if (hit) {
+        onHit?.()
+        hit.object.userData.onHit(hit.point as THREE.Vector3)
+      }
     }
-  }, [camera, dir, ndc, play, recoilDebtRef, recoilReturnSpeedRef, scene.children, weaponConfig])
+  }, [camera, dir, ndc, onHit, onShot, play, recoilDebtRef, recoilReturnSpeedRef, scene.children, weaponConfig])
 
   useEffect(() => {
     const handlePointerDown = (e: PointerEvent) => {
@@ -222,9 +230,13 @@ function TargetSpotlight({
 export function Scene({
   weapon,
   onTargetFallen,
+  onShot,
+  onHit,
 }: {
   weapon: WeaponKey
   onTargetFallen?: (targetKey: TargetKey) => void
+  onShot?: () => void
+  onHit?: () => void
 }) {
   const recoilDebtRef = useRef(0)
   const recoilReturnSpeedRef = useRef(WEAPONS[weapon].recoilReturnSpeed)
@@ -270,6 +282,8 @@ export function Scene({
         weapon={weapon}
         recoilDebtRef={recoilDebtRef}
         recoilReturnSpeedRef={recoilReturnSpeedRef}
+        onShot={onShot}
+        onHit={onHit}
       />
       <CameraRecoil recoilDebtRef={recoilDebtRef} returnSpeedRef={recoilReturnSpeedRef} />
 

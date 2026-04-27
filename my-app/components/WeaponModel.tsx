@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
 import * as THREE from "three"
@@ -21,19 +21,19 @@ const WEAPON_TRANSFORMS: Record<
   }
 > = {
   pistol: {
-    offset: new THREE.Vector3(0.22, -0.26, -0.42),
-    rotation: new THREE.Euler(0.02, Math.PI, 0.04),
-    scale: 0.24,
+    offset: new THREE.Vector3(0.25, -0.30, -0.48),
+    rotation: new THREE.Euler(0.03, Math.PI, 0.035),
+    scale: 0.22,
   },
   ak47: {
-    offset: new THREE.Vector3(0.24, -0.28, -0.56),
-    rotation: new THREE.Euler(0.06, Math.PI, 0.03),
-    scale: 0.18,
+    offset: new THREE.Vector3(0.27, -0.32, -0.60),
+    rotation: new THREE.Euler(0.065, Math.PI, 0.03),
+    scale: 0.16,
   },
   sniper: {
-    offset: new THREE.Vector3(0.24, -0.30, -0.64),
-    rotation: new THREE.Euler(0.04, Math.PI, 0.02),
-    scale: 0.16,
+    offset: new THREE.Vector3(0.29, -0.35, -0.70),
+    rotation: new THREE.Euler(0.03, Math.PI, 0.015),
+    scale: 0.145,
   },
 }
 
@@ -41,11 +41,14 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
   const groupRef = useRef<THREE.Group>(null)
   const modelRef = useRef<THREE.Group>(null)
   const { camera } = useThree()
+  const aimingRef = useRef(false)
+  const aimBlendRef = useRef(0)
   const { scene } = useGLTF(WEAPON_MODEL_URLS[weapon])
   const transform = WEAPON_TRANSFORMS[weapon]
   const offset = transform.offset
 
   const tmp = useMemo(() => new THREE.Vector3(), [])
+  const adsOffset = useMemo(() => new THREE.Vector3(0.10, 0.07, 0.16), [])
   const model = useMemo(() => {
     const cloned = scene.clone(true)
     cloned.traverse((obj) => {
@@ -71,14 +74,53 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
     return cloned
   }, [scene])
 
-  useFrame(() => {
+  useEffect(() => {
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 2) return
+      if (!document.pointerLockElement) return
+      if (weapon !== "sniper") return
+      aimingRef.current = true
+    }
+    const onMouseUp = (e: MouseEvent) => {
+      if (e.button !== 2) return
+      aimingRef.current = false
+    }
+    const onLockChange = () => {
+      if (!document.pointerLockElement) aimingRef.current = false
+    }
+
+    document.addEventListener("mousedown", onMouseDown)
+    document.addEventListener("mouseup", onMouseUp)
+    document.addEventListener("pointerlockchange", onLockChange)
+    return () => {
+      document.removeEventListener("mousedown", onMouseDown)
+      document.removeEventListener("mouseup", onMouseUp)
+      document.removeEventListener("pointerlockchange", onLockChange)
+    }
+  }, [weapon])
+
+  useFrame((_, delta) => {
     if (!groupRef.current) return
+
+    // Smooth ADS transition for sniper to keep reticle visibility clean.
+    const aimTarget = weapon === "sniper" && aimingRef.current ? 1 : 0
+    const t = 1 - Math.exp(-12 * delta)
+    aimBlendRef.current = THREE.MathUtils.lerp(aimBlendRef.current, aimTarget, t)
+
     groupRef.current.quaternion.copy(camera.quaternion)
-    tmp.copy(offset).applyQuaternion(camera.quaternion)
+    tmp.copy(offset)
+    if (weapon === "sniper" && aimBlendRef.current > 0.001) {
+      tmp.lerp(adsOffset, aimBlendRef.current)
+    }
+    tmp.applyQuaternion(camera.quaternion)
     groupRef.current.position.copy(camera.position).add(tmp)
 
     if (modelRef.current) {
       modelRef.current.rotation.copy(transform.rotation)
+      if (weapon === "sniper" && aimBlendRef.current > 0.001) {
+        modelRef.current.rotation.x = THREE.MathUtils.lerp(transform.rotation.x, 0, aimBlendRef.current)
+        modelRef.current.rotation.z = THREE.MathUtils.lerp(transform.rotation.z, 0, aimBlendRef.current)
+      }
       modelRef.current.scale.setScalar(transform.scale)
     }
   })

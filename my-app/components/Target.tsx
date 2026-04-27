@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { Sparks } from "./Sparks"
@@ -17,6 +17,16 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
   const groupRef = useRef<THREE.Group>(null)
   const [isHit, setIsHit] = useState(false)
   const [impactPoint, setImpactPoint] = useState<THREE.Vector3 | null>(null)
+
+  useEffect(() => {
+    if (!isHit) return
+    const t = window.setTimeout(() => {
+      setIsHit(false)
+      setImpactPoint(null)
+    }, 5000)
+
+    return () => window.clearTimeout(t)
+  }, [isHit])
 
   // Use useFrame to animate the backward rotation smoothly
   useFrame((state, delta) => {

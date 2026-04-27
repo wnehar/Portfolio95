@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber"
 import { Environment } from "./Environment"
 import { Player } from "./Player"
+import { Target } from "./Target"
 
 export function Scene() {
   return (
@@ -21,6 +22,12 @@ export function Scene() {
       />
       
       <Environment />
+      
+      {/* 3 cibles alignées face au joueur (z=-5 est à 10 mètres de z=5) */}
+      <Target position={[-3, 0, -5]} />
+      <Target position={[0, 0, -5]} />
+      <Target position={[3, 0, -5]} />
+
       <Player />
     </Canvas>
   )

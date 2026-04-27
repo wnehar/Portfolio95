@@ -122,7 +122,8 @@ export function Player() {
     const x = Number(right) - Number(left)
     
     // Movement relative to yaw (ground plane)
-    forwardVec.set(Math.sin(yawRef.current), 0, Math.cos(yawRef.current)).normalize()
+    // In Three.js, forward is -Z by default, so we invert.
+    forwardVec.set(-Math.sin(yawRef.current), 0, -Math.cos(yawRef.current)).normalize()
     rightVec.set(forwardVec.z, 0, -forwardVec.x).normalize()
 
     direction.current.set(0, 0, 0)

@@ -7,6 +7,7 @@ import * as THREE from "three"
 import { Environment } from "./Environment"
 import { Player } from "./Player"
 import { Target, type TargetKey } from "./Target"
+import { Bloom, EffectComposer } from "@react-three/postprocessing"
 
 function LightBeam({
   lightPosition,
@@ -70,7 +71,7 @@ function CameraRecoil({ recoilDebtRef }: { recoilDebtRef: React.MutableRefObject
     if (debt <= 0) return
 
     camera.getWorldDirection(dir)
-    const returnSpeed = 3.0 // units/sec
+    const returnSpeed = 12.0 // units/sec (subtle & quick)
     const step = Math.min(debt, returnSpeed * delta)
     camera.position.addScaledVector(dir, step)
     recoilDebtRef.current -= step
@@ -91,13 +92,15 @@ function RaycastShooter({
 
   useEffect(() => {
     const handlePointerDown = () => {
+      // Only shoot when pointer is locked (prevents accidental shots while clicking UI)
+      if (!document.pointerLockElement) return
       raycasterRef.current.setFromCamera(ndc, camera)
       const intersects = raycasterRef.current.intersectObjects(scene.children, true)
       const hit = intersects.find((i) => i.object?.userData?.isTarget && typeof i.object.userData.onHit === "function")
       if (!hit) return
 
       // Instant kick back (recoil) + add debt to return smoothly
-      const kick = 0.15
+      const kick = 0.08
       camera.getWorldDirection(dir)
       camera.position.addScaledVector(dir, -kick)
       recoilDebtRef.current += kick
@@ -194,6 +197,11 @@ export function Scene({ onTargetFallen }: { onTargetFallen?: (targetKey: TargetK
       <Player />
       <RaycastShooter recoilDebtRef={recoilDebtRef} />
       <CameraRecoil recoilDebtRef={recoilDebtRef} />
+
+      {/* Bloom léger sur les zones néon (emissive) */}
+      <EffectComposer multisampling={0}>
+        <Bloom intensity={0.35} luminanceThreshold={0.55} luminanceSmoothing={0.2} />
+      </EffectComposer>
     </Canvas>
   )
 }

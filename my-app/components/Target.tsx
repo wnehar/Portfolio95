@@ -17,9 +17,11 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
   const groupRef = useRef<THREE.Group>(null)
   const [isHit, setIsHit] = useState(false)
   const [impactPoint, setImpactPoint] = useState<THREE.Vector3 | null>(null)
+  const hitTimeRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!isHit) return
+    hitTimeRef.current = performance.now()
     const t = window.setTimeout(() => {
       setIsHit(false)
       setImpactPoint(null)
@@ -37,8 +39,21 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
     groupRef.current.rotation.x = THREE.MathUtils.lerp(
       groupRef.current.rotation.x,
       targetRotationX,
-      10 * delta
+      22 * delta
     )
+
+    // Small energetic vibration right after impact
+    const hitTime = hitTimeRef.current
+    const elapsed = hitTime ? (performance.now() - hitTime) / 1000 : 999
+    if (elapsed < 0.18) {
+      const p = 1 - elapsed / 0.18
+      const amp = 0.08 * p
+      groupRef.current.rotation.z = Math.sin(elapsed * 70) * amp
+      groupRef.current.rotation.y = Math.cos(elapsed * 90) * amp * 0.6
+    } else {
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, 0, 18 * delta)
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 18 * delta)
+    }
   })
 
   // Fonction appelée par le raycaster global lorsqu'on tire sur cette cible

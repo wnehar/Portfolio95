@@ -5,6 +5,7 @@ import * as THREE from "three"
 
 const keys = { 
   KeyW: "forward", KeyS: "backward", KeyA: "left", KeyD: "right", 
+  KeyZ: "forward", KeyQ: "left",
   ArrowUp: "forward", ArrowDown: "backward", ArrowLeft: "left", ArrowRight: "right" 
 }
 

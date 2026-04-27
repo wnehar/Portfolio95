@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
+import { WEAPONS, type WeaponKey } from "./weapons"
 
 const keys = { 
   KeyW: "forward", KeyS: "backward", KeyA: "left", KeyD: "right", 
@@ -45,7 +46,7 @@ export const usePlayerControls = () => {
   return movement
 }
 
-export function Player() {
+export function Player({ weapon }: { weapon: WeaponKey }) {
   const { forward, backward, left, right } = usePlayerControls()
   const { camera, gl } = useThree()
   const cameraRef = useRef<THREE.Camera | null>(null)
@@ -63,6 +64,8 @@ export function Player() {
   const pitchRef = useRef(0)
   const yawTargetRef = useRef(0)
   const pitchTargetRef = useRef(0)
+  const zoomingRef = useRef(false)
+  const fovTargetRef = useRef(75)
 
   useEffect(() => {
     cameraRef.current = camera
@@ -92,16 +95,39 @@ export function Player() {
       pitchTargetRef.current = Math.max(-maxPitch, Math.min(maxPitch, pitchTargetRef.current))
     }
 
+    const onContextMenu = (e: MouseEvent) => {
+      // Prevent right-click menu while aiming
+      if (isLockedRef.current) e.preventDefault()
+    }
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 2) return
+      if (!isLockedRef.current) return
+      if (weapon !== "sniper") return
+      zoomingRef.current = true
+    }
+
+    const onMouseUp = (e: MouseEvent) => {
+      if (e.button !== 2) return
+      zoomingRef.current = false
+    }
+
     dom.addEventListener("pointerdown", onPointerDown)
     document.addEventListener("pointerlockchange", onPointerLockChange)
     document.addEventListener("mousemove", onMouseMove)
+    document.addEventListener("contextmenu", onContextMenu, true)
+    document.addEventListener("mousedown", onMouseDown)
+    document.addEventListener("mouseup", onMouseUp)
 
     return () => {
       dom.removeEventListener("pointerdown", onPointerDown)
       document.removeEventListener("pointerlockchange", onPointerLockChange)
       document.removeEventListener("mousemove", onMouseMove)
+      document.removeEventListener("contextmenu", onContextMenu, true)
+      document.removeEventListener("mousedown", onMouseDown)
+      document.removeEventListener("mouseup", onMouseUp)
     }
-  }, [])
+  }, [weapon])
 
   useFrame((state, delta) => {
     if (!isLockedRef.current) return
@@ -117,6 +143,21 @@ export function Player() {
     cam.rotation.order = "YXZ"
     cam.rotation.y = yawRef.current
     cam.rotation.x = pitchRef.current
+
+    // Zoom (sniper RMB)
+    const baseFov = 75
+    const zoomCfg = WEAPONS[weapon].zoom
+    const desired = zoomCfg?.enabled && zoomingRef.current ? zoomCfg.fov : baseFov
+    const zoomDamping = zoomCfg?.enabled ? zoomCfg.damping : 12
+    fovTargetRef.current = desired
+
+    if ("fov" in cam) {
+      const current = (cam as THREE.PerspectiveCamera).fov
+      const tz = 1 - Math.exp(-zoomDamping * delta)
+      const next = THREE.MathUtils.lerp(current, fovTargetRef.current, tz)
+      ;(cam as THREE.PerspectiveCamera).fov = next
+      ;(cam as THREE.PerspectiveCamera).updateProjectionMatrix()
+    }
 
     const z = Number(forward) - Number(backward)
     const x = Number(right) - Number(left)

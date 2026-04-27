@@ -8,6 +8,9 @@ import { Environment } from "./Environment"
 import { Player } from "./Player"
 import { Target, type TargetKey } from "./Target"
 import { Bloom, EffectComposer } from "@react-three/postprocessing"
+import { WeaponModel } from "./WeaponModel"
+import { WEAPONS, type WeaponKey } from "./weapons"
+import { useGunSound } from "./useGunSound"
 
 function LightBeam({
   lightPosition,
@@ -58,7 +61,13 @@ function LightBeam({
   )
 }
 
-function CameraRecoil({ recoilDebtRef }: { recoilDebtRef: React.MutableRefObject<number> }) {
+function CameraRecoil({
+  recoilDebtRef,
+  returnSpeedRef,
+}: {
+  recoilDebtRef: React.MutableRefObject<number>
+  returnSpeedRef: React.MutableRefObject<number>
+}) {
   const { camera } = useThree()
   const dir = useMemo(() => new THREE.Vector3(), [])
 
@@ -71,7 +80,7 @@ function CameraRecoil({ recoilDebtRef }: { recoilDebtRef: React.MutableRefObject
     if (debt <= 0) return
 
     camera.getWorldDirection(dir)
-    const returnSpeed = 12.0 // units/sec (subtle & quick)
+    const returnSpeed = returnSpeedRef.current
     const step = Math.min(debt, returnSpeed * delta)
     camera.position.addScaledVector(dir, step)
     recoilDebtRef.current -= step
@@ -80,37 +89,91 @@ function CameraRecoil({ recoilDebtRef }: { recoilDebtRef: React.MutableRefObject
   return null
 }
 
-function RaycastShooter({
+function WeaponShooter({
+  weapon,
   recoilDebtRef,
+  recoilReturnSpeedRef,
 }: {
+  weapon: WeaponKey
   recoilDebtRef: React.MutableRefObject<number>
+  recoilReturnSpeedRef: React.MutableRefObject<number>
 }) {
   const { camera, scene } = useThree()
   const raycasterRef = useRef(new THREE.Raycaster())
   const ndc = useMemo(() => new THREE.Vector2(0, 0), [])
   const dir = useMemo(() => new THREE.Vector3(), [])
+  const isFiringRef = useRef(false)
+  const nextShotAtRef = useRef(0)
+  const allowSemiRef = useRef(true)
+  const { play } = useGunSound()
 
-  useEffect(() => {
-    const handlePointerDown = () => {
+  const weaponConfig = WEAPONS[weapon]
+
+  const doShot = useMemo(() => {
+    return () => {
       // Only shoot when pointer is locked (prevents accidental shots while clicking UI)
       if (!document.pointerLockElement) return
+
+      // Recoil
+      camera.getWorldDirection(dir)
+      camera.position.addScaledVector(dir, -weaponConfig.recoilKick)
+      recoilDebtRef.current += weaponConfig.recoilKick
+      recoilReturnSpeedRef.current = weaponConfig.recoilReturnSpeed
+
+      // Sound (best-effort)
+      play(weaponConfig.sound.type, weaponConfig.sound.gain)
+
+      // Raycast hit detection (targets only)
       raycasterRef.current.setFromCamera(ndc, camera)
       const intersects = raycasterRef.current.intersectObjects(scene.children, true)
       const hit = intersects.find((i) => i.object?.userData?.isTarget && typeof i.object.userData.onHit === "function")
-      if (!hit) return
+      if (hit) hit.object.userData.onHit(hit.point as THREE.Vector3)
+    }
+  }, [camera, dir, ndc, play, recoilDebtRef, recoilReturnSpeedRef, scene.children, weaponConfig])
 
-      // Instant kick back (recoil) + add debt to return smoothly
-      const kick = 0.08
-      camera.getWorldDirection(dir)
-      camera.position.addScaledVector(dir, -kick)
-      recoilDebtRef.current += kick
+  useEffect(() => {
+    const handlePointerDown = (e: PointerEvent) => {
+      if (e.button !== 0) return
+      if (!document.pointerLockElement) return
 
-      hit.object.userData.onHit(hit.point as THREE.Vector3)
+      if (weaponConfig.automatic) {
+        isFiringRef.current = true
+        // Shoot immediately
+        const now = performance.now()
+        nextShotAtRef.current = now
+      } else {
+        if (!allowSemiRef.current) return
+        allowSemiRef.current = false
+        doShot()
+      }
+    }
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (e.button !== 0) return
+      isFiringRef.current = false
+      allowSemiRef.current = true
     }
 
     window.addEventListener("pointerdown", handlePointerDown)
-    return () => window.removeEventListener("pointerdown", handlePointerDown)
-  }, [camera, scene, ndc, dir, recoilDebtRef])
+    window.addEventListener("pointerup", handlePointerUp)
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown)
+      window.removeEventListener("pointerup", handlePointerUp)
+    }
+  }, [doShot, weaponConfig.automatic])
+
+  useFrame(() => {
+    if (!weaponConfig.automatic) return
+    if (!isFiringRef.current) return
+    if (!document.pointerLockElement) return
+
+    const now = performance.now()
+    const intervalMs = 1000 / weaponConfig.shotsPerSecond
+    if (now < nextShotAtRef.current) return
+
+    doShot()
+    nextShotAtRef.current = now + intervalMs
+  })
 
   return null
 }
@@ -156,8 +219,15 @@ function TargetSpotlight({
   )
 }
 
-export function Scene({ onTargetFallen }: { onTargetFallen?: (targetKey: TargetKey) => void }) {
+export function Scene({
+  weapon,
+  onTargetFallen,
+}: {
+  weapon: WeaponKey
+  onTargetFallen?: (targetKey: TargetKey) => void
+}) {
   const recoilDebtRef = useRef(0)
+  const recoilReturnSpeedRef = useRef(WEAPONS[weapon].recoilReturnSpeed)
 
   return (
     <Canvas
@@ -194,9 +264,14 @@ export function Scene({ onTargetFallen }: { onTargetFallen?: (targetKey: TargetK
       <Target targetKey="skills" position={[0, 0, -5]} onFallen={onTargetFallen} />
       <Target targetKey="contact" position={[3, 0, -5]} onFallen={onTargetFallen} />
 
-      <Player />
-      <RaycastShooter recoilDebtRef={recoilDebtRef} />
-      <CameraRecoil recoilDebtRef={recoilDebtRef} />
+      <Player weapon={weapon} />
+      <WeaponModel weapon={weapon} />
+      <WeaponShooter
+        weapon={weapon}
+        recoilDebtRef={recoilDebtRef}
+        recoilReturnSpeedRef={recoilReturnSpeedRef}
+      />
+      <CameraRecoil recoilDebtRef={recoilDebtRef} returnSpeedRef={recoilReturnSpeedRef} />
 
       {/* Bloom léger sur les zones néon (emissive) */}
       <EffectComposer multisampling={0}>

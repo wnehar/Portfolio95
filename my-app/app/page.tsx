@@ -4,9 +4,12 @@ import { useCallback, useMemo, useState } from "react";
 import { Scene } from "@/components/Scene";
 import { InfoModal } from "@/components/InfoModal";
 import type { TargetKey } from "@/components/Target";
+import { WEAPONS, type WeaponKey } from "@/components/weapons";
 
 export default function Home() {
   const [openKey, setOpenKey] = useState<TargetKey | null>(null);
+  const [weapon, setWeapon] = useState<WeaponKey>("pistol");
+  const [weaponsOpen, setWeaponsOpen] = useState(false);
 
   const contentByTarget = useMemo(() => {
     return {
@@ -69,7 +72,7 @@ export default function Home() {
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black">
       {/* 3D Scene */}
-      <Scene onTargetFallen={handleTargetFallen} />
+      <Scene weapon={weapon} onTargetFallen={handleTargetFallen} />
       
       {/* UI Overlay */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
@@ -97,6 +100,40 @@ export default function Home() {
           <span>Souris : Caméra</span>
           <span>Clic : Verrouiller / Jouer</span>
           <span>Échap : Quitter</span>
+        </div>
+      </div>
+
+      {/* Weapons UI (bottom-right) */}
+      <div className="pointer-events-auto fixed bottom-6 right-6 z-40">
+        <div className="relative">
+          {weaponsOpen && (
+            <div className="absolute bottom-14 right-0 w-44 overflow-hidden rounded-xl border border-white/10 bg-neutral-950/85 shadow-2xl backdrop-blur">
+              {(["pistol", "ak47", "sniper"] as WeaponKey[]).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => {
+                    setWeapon(k);
+                    setWeaponsOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between px-4 py-3 text-sm text-white/85 hover:bg-white/10 ${
+                    weapon === k ? "bg-white/10" : ""
+                  }`}
+                >
+                  <span>{WEAPONS[k].label}</span>
+                  {weapon === k && <span className="text-xs text-white/60">Actif</span>}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setWeaponsOpen((v) => !v)}
+            className="h-12 w-24 rounded-xl border border-white/15 bg-neutral-950/70 text-xs font-semibold tracking-widest text-white/90 shadow-lg backdrop-blur hover:bg-neutral-900/70 focus:outline-none focus:ring-2 focus:ring-white/25"
+          >
+            ARMES
+          </button>
         </div>
       </div>
     </main>

@@ -67,10 +67,26 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
     <group position={position}>
       {/* Pivot group at the base (y=0) */}
       <group ref={groupRef}>
-        {/* Support post */}
+        {/* Support post (acier usé) */}
         <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.2, 1, 0.2]} />
-          <meshStandardMaterial color="#555" />
+          <meshStandardMaterial color="#6a6f75" roughness={0.65} metalness={0.8} />
+        </mesh>
+
+        {/* Base plate */}
+        <mesh position={[0, 0.02, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.9, 0.04, 0.9]} />
+          <meshStandardMaterial color="#5f666d" roughness={0.7} metalness={0.85} />
+        </mesh>
+
+        {/* Angled supports (worn steel) */}
+        <mesh position={[-0.28, 0.6, 0]} rotation={[0, 0, Math.PI / 10]} castShadow receiveShadow>
+          <boxGeometry args={[0.08, 0.95, 0.08]} />
+          <meshStandardMaterial color="#70767d" roughness={0.72} metalness={0.75} />
+        </mesh>
+        <mesh position={[0.28, 0.6, 0]} rotation={[0, 0, -Math.PI / 10]} castShadow receiveShadow>
+          <boxGeometry args={[0.08, 0.95, 0.08]} />
+          <meshStandardMaterial color="#70767d" roughness={0.72} metalness={0.75} />
         </mesh>
         
         {/* Circular target at the top of the post */}
@@ -84,7 +100,7 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
         >
           {/* Main red circle */}
           <cylinderGeometry args={[0.8, 0.8, 0.1, 32]} />
-          <meshStandardMaterial color="#e53935" roughness={0.4} />
+          <meshStandardMaterial color="#b71c1c" roughness={0.55} metalness={0.05} />
           
           {/* White inner circle */}
           <mesh position={[0, 0.051, 0]}>
@@ -92,10 +108,16 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
              <meshStandardMaterial color="white" roughness={0.4} />
           </mesh>
           
-          {/* Red bullseye */}
+          {/* Neon red bullseye */}
           <mesh position={[0, 0.052, 0]}>
              <cylinderGeometry args={[0.2, 0.2, 0.01, 32]} />
-             <meshStandardMaterial color="#e53935" roughness={0.4} />
+             <meshStandardMaterial
+               color="#ff1744"
+               emissive="#ff1744"
+               emissiveIntensity={2.4}
+               roughness={0.25}
+               metalness={0.1}
+             />
           </mesh>
         </mesh>
       </group>

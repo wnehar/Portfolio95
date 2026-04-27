@@ -106,7 +106,7 @@ export function Scene({ onTargetFallen }: { onTargetFallen?: (targetKey: TargetK
       camera={{ fov: 75, near: 0.1, far: 1000, position: [0, 2, 5] }}
       className="h-full w-full"
     >
-      <color attach="background" args={["#87ceeb"]} /> {/* Ciel par défaut */}
+      <color attach="background" args={["#2a2d32"]} /> {/* Ciel gris foncé uniforme */}
       <ambientLight intensity={0.5} />
       <directionalLight 
         position={[10, 20, 10]} 

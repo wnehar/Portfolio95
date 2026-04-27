@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
+import { Sparks } from "./Sparks"
 
 interface TargetProps {
   position: [number, number, number]
@@ -11,6 +12,7 @@ interface TargetProps {
 export function Target({ position }: TargetProps) {
   const groupRef = useRef<THREE.Group>(null)
   const [isHit, setIsHit] = useState(false)
+  const [impactPoint, setImpactPoint] = useState<THREE.Vector3 | null>(null)
 
   // Use useFrame to animate the backward rotation smoothly
   useFrame((state, delta) => {
@@ -24,6 +26,27 @@ export function Target({ position }: TargetProps) {
       10 * delta
     )
   })
+
+  // Fonction appelée par le raycaster global lorsqu'on tire sur cette cible
+  const handleHit = (point: THREE.Vector3) => {
+    if (!isHit) {
+      setIsHit(true)
+      // On sauvegarde le point d'impact (dans l'espace monde) pour générer les étincelles
+      // Comme la Target elle-même va pivoter, on pourrait vouloir placer les étincelles globalement
+      // Mais comme elles disparaissent vite, on peut simplement les attacher à la scène via le Player
+      // Ou ici, on convertit le point monde en point local si on les attache à la cible.
+      // Pour faire simple, on passe le point monde direct au composant Sparks si on l'attache en absolu, 
+      // ou on convertit. Les particules sont éjectées rapidement de toute façon.
+      
+      // Convertir le point d'impact du monde vers les coordonnées locales du groupe parent
+      if (groupRef.current && groupRef.current.parent) {
+        const localPoint = groupRef.current.parent.worldToLocal(point.clone())
+        setImpactPoint(localPoint)
+      } else {
+        setImpactPoint(point)
+      }
+    }
+  }
 
   return (
     <group position={position}>
@@ -42,10 +65,7 @@ export function Target({ position }: TargetProps) {
           rotation={[Math.PI / 2, 0, 0]} 
           castShadow 
           receiveShadow
-          onClick={(e) => {
-            e.stopPropagation() // Prevent click from passing through
-            if (!isHit) setIsHit(true)
-          }}
+          userData={{ isTarget: true, onHit: handleHit }}
         >
           {/* Main red circle */}
           <cylinderGeometry args={[0.8, 0.8, 0.1, 32]} />
@@ -64,6 +84,9 @@ export function Target({ position }: TargetProps) {
           </mesh>
         </mesh>
       </group>
+      
+      {/* Affichage des étincelles au point d'impact */}
+      {impactPoint && <Sparks position={impactPoint} />}
     </group>
   )
 }

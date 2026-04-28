@@ -27,14 +27,46 @@ export function InfoModal({
       aria-modal="true"
       aria-label={title}
     >
+      <style jsx>{`
+        @keyframes modalBackdropIn {
+          from {
+            opacity: 0;
+            backdrop-filter: blur(0px);
+          }
+          to {
+            opacity: 1;
+            backdrop-filter: blur(20px);
+          }
+        }
+
+        @keyframes modalCardIn {
+          0% {
+            opacity: 0;
+            transform: translateY(28px) scale(0.94);
+          }
+          60% {
+            opacity: 1;
+            transform: translateY(-6px) scale(1.01);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
+
       <button
         type="button"
         aria-label="Fermer"
         className="absolute inset-0 bg-black/70 backdrop-blur-xl"
+        style={{ animation: "modalBackdropIn 240ms ease-out both" }}
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-[28px] border border-white/15 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_38%),linear-gradient(180deg,rgba(23,23,23,0.98),rgba(8,8,8,0.96))] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+      <div
+        className="relative w-full max-w-4xl overflow-hidden rounded-[28px] border border-white/15 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_38%),linear-gradient(180deg,rgba(23,23,23,0.98),rgba(8,8,8,0.96))] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+        style={{ animation: "modalCardIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both" }}
+      >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         <div className="pointer-events-none absolute -left-16 top-10 h-32 w-32 rounded-full bg-red-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-12 bottom-16 h-36 w-36 rounded-full bg-white/10 blur-3xl" />

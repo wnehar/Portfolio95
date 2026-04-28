@@ -96,6 +96,22 @@ export default function Home() {
         title: "Projets & compétences",
         body: (
           <div className="space-y-6">
+            <div className="rounded-[24px] border border-red-400/20 bg-[linear-gradient(180deg,rgba(120,16,34,0.28),rgba(255,255,255,0.03))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+              <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/80">Parcours</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">Etudiant en Bachelor 1 a Eugenia School</h3>
+              <p className="mt-3 text-white/72">
+                Je suis actuellement etudiant en Bachelor premiere annee a Eugenia School,
+                avec un fort interet pour le digital, l’IA, le web design et la creation
+                de projets concrets.
+              </p>
+              <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 px-4 py-4">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Stage</p>
+                <p className="mt-1 text-base font-medium text-white">
+                  Experience realisee chez Actif Digital, entreprise de marketing digital.
+                </p>
+              </div>
+            </div>
+
             <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Portfolio</p>
               <h3 className="mt-2 text-2xl font-semibold text-white">Mes projets</h3>

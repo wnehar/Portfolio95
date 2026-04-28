@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
+import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 
 function makeNoiseTexture({
@@ -141,6 +142,34 @@ function DisplayColumn({ x }: { x: number }) {
         <meshStandardMaterial color="#3a4048" roughness={0.42} metalness={0.78} />
       </mesh>
     </group>
+  )
+}
+
+function FloatingDust() {
+  const pointsRef = useRef<THREE.Points>(null)
+  const positions = useMemo(() => {
+    const data = new Float32Array(180 * 3)
+    for (let i = 0; i < 180; i++) {
+      data[i * 3 + 0] = (Math.random() - 0.5) * 18
+      data[i * 3 + 1] = Math.random() * 5.5 - 0.8
+      data[i * 3 + 2] = -Math.random() * 16 + 3
+    }
+    return data
+  }, [])
+
+  useFrame((state) => {
+    if (!pointsRef.current) return
+    pointsRef.current.rotation.y = state.clock.elapsedTime * 0.015
+    pointsRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.12) * 0.08
+  })
+
+  return (
+    <points ref={pointsRef} position={[0, 0.8, -3]}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial color="#d9e4ff" size={0.045} transparent opacity={0.16} sizeAttenuation depthWrite={false} />
+    </points>
   )
 }
 
@@ -364,6 +393,9 @@ export function Environment() {
       <pointLight position={[-7.4, 1.2, 1.6]} intensity={10} distance={6} decay={2} color="#8be9fd" />
       <pointLight position={[7.4, 1.2, 1.6]} intensity={10} distance={6} decay={2} color="#ff4d6d" />
       <pointLight position={[0, 0.3, -7.8]} intensity={8} distance={8} decay={2} color="#ffd166" />
+
+      {/* Signature ambient detail */}
+      <FloatingDust />
     </group>
   )
 }

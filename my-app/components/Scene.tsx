@@ -1,8 +1,7 @@
 "use client"
 
-import { Canvas, useFrame } from "@react-three/fiber"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
-import { useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { Environment } from "./Environment"
 import { Player } from "./Player"
@@ -87,6 +86,49 @@ function CameraRecoil({
   })
 
   return null
+}
+
+function MuzzleFlash({ shotCount }: { shotCount: number }) {
+  const { camera } = useThree()
+  const flashRef = useRef<THREE.Mesh>(null)
+  const lightRef = useRef<THREE.PointLight>(null)
+  const flashUntilRef = useRef(0)
+  const offset = useMemo(() => new THREE.Vector3(0.24, -0.13, -0.7), [])
+  const worldOffset = useMemo(() => new THREE.Vector3(), [])
+
+  useEffect(() => {
+    if (shotCount <= 0) return
+    flashUntilRef.current = performance.now() + 45
+  }, [shotCount])
+
+  useFrame(() => {
+    if (!flashRef.current || !lightRef.current) return
+
+    worldOffset.copy(offset).applyQuaternion(camera.quaternion)
+    flashRef.current.position.copy(camera.position).add(worldOffset)
+    flashRef.current.quaternion.copy(camera.quaternion)
+    lightRef.current.position.copy(flashRef.current.position)
+
+    const active = performance.now() < flashUntilRef.current && document.pointerLockElement
+    flashRef.current.visible = active
+    lightRef.current.visible = active
+
+    if (active) {
+      const flicker = 1 + Math.random() * 0.55
+      flashRef.current.scale.setScalar(0.12 * flicker)
+      lightRef.current.intensity = 4.5 * flicker
+    }
+  })
+
+  return (
+    <>
+      <mesh ref={flashRef} visible={false}>
+        <sphereGeometry args={[1, 12, 12]} />
+        <meshBasicMaterial color="#ffd7a8" transparent opacity={0.9} />
+      </mesh>
+      <pointLight ref={lightRef} visible={false} intensity={0} distance={4.2} decay={2} color="#ffb36b" />
+    </>
+  )
 }
 
 function WeaponShooter({
@@ -232,11 +274,13 @@ export function Scene({
   onTargetFallen,
   onShot,
   onHit,
+  shotCount = 0,
 }: {
   weapon: WeaponKey
   onTargetFallen?: (targetKey: TargetKey) => void
   onShot?: () => void
   onHit?: () => void
+  shotCount?: number
 }) {
   const recoilDebtRef = useRef(0)
   const recoilReturnSpeedRef = useRef(WEAPONS[weapon].recoilReturnSpeed)
@@ -290,6 +334,7 @@ export function Scene({
 
       <Player weapon={weapon} />
       <WeaponModel weapon={weapon} />
+      <MuzzleFlash shotCount={shotCount} />
       <WeaponShooter
         weapon={weapon}
         recoilDebtRef={recoilDebtRef}

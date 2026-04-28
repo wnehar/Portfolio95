@@ -180,12 +180,16 @@ export default function Home() {
             onTargetFallen={handleTargetFallen}
             onShot={handleShot}
             onHit={handleHit}
+            shotCount={shots}
           />
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <div className="relative flex h-6 w-6 items-center justify-center mix-blend-difference">
-              <div className="absolute h-full w-[2px] bg-white" />
-              <div className="absolute h-[2px] w-full bg-white" />
+            <div className="relative flex h-10 w-10 items-center justify-center">
+              <div className="absolute h-10 w-10 rounded-full border border-white/8 bg-white/[0.02] backdrop-blur-[1px]" />
+              <div className="absolute h-5 w-5 rounded-full border border-red-400/25" />
+              <div className="absolute h-full w-px bg-gradient-to-b from-transparent via-white/90 to-transparent" />
+              <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-white/90 to-transparent" />
+              <div className="absolute h-1.5 w-1.5 rounded-full bg-red-400/90 shadow-[0_0_14px_rgba(248,113,113,0.9)]" />
             </div>
           </div>
 
@@ -206,8 +210,8 @@ export default function Home() {
             </InfoModal>
           )}
 
-          <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-white/80 mix-blend-difference">
-            <p className="mb-2 text-sm uppercase tracking-widest font-bold">Contrôles</p>
+          <div className="pointer-events-none absolute bottom-8 left-1/2 z-40 -translate-x-1/2 rounded-full border border-white/10 bg-black/40 px-5 py-3 text-center text-white/80 shadow-xl backdrop-blur-md">
+            <p className="mb-2 text-[11px] uppercase tracking-[0.32em] text-white/50">Contrôles</p>
             <div className="flex gap-6 text-xs font-mono">
               <span>ZQSD / WASD : Déplacement</span>
               <span>Souris : Caméra</span>
@@ -216,7 +220,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="pointer-events-none fixed left-6 top-6 z-40 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-white/90 shadow-xl backdrop-blur-md">
+          <div className="pointer-events-none fixed left-6 top-6 z-40 overflow-hidden rounded-[24px] border border-white/10 bg-black/45 px-4 py-3 text-white/90 shadow-xl backdrop-blur-md">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
             <div className="mb-1 text-[11px] uppercase tracking-[0.25em] text-white/55">Arcade</div>
             <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
               <span>Score</span>
@@ -236,7 +241,7 @@ export default function Home() {
           <div className="pointer-events-auto fixed bottom-6 right-6 z-40">
             <div className="relative">
               {weaponsOpen && (
-                <div className="absolute bottom-14 right-0 w-44 overflow-hidden rounded-xl border border-white/10 bg-neutral-950/85 shadow-2xl backdrop-blur">
+                <div className="absolute bottom-14 right-0 w-48 overflow-hidden rounded-2xl border border-white/10 bg-neutral-950/90 shadow-2xl backdrop-blur-xl">
                   {(["pistol", "ak47", "sniper"] as WeaponKey[]).map((k) => (
                     <button
                       key={k}
@@ -245,7 +250,7 @@ export default function Home() {
                         setWeapon(k);
                         setWeaponsOpen(false);
                       }}
-                      className={`flex w-full items-center justify-between px-4 py-3 text-sm text-white/85 hover:bg-white/10 ${
+                      className={`flex w-full items-center justify-between px-4 py-3 text-sm text-white/85 transition hover:bg-white/10 ${
                         weapon === k ? "bg-white/10" : ""
                       }`}
                     >
@@ -259,7 +264,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setWeaponsOpen((v) => !v)}
-                className="h-12 w-24 rounded-xl border border-white/15 bg-neutral-950/70 text-xs font-semibold tracking-widest text-white/90 shadow-lg backdrop-blur hover:bg-neutral-900/70 focus:outline-none focus:ring-2 focus:ring-white/25"
+                className="h-12 w-28 rounded-2xl border border-white/15 bg-neutral-950/75 text-xs font-semibold tracking-[0.25em] text-white/90 shadow-lg backdrop-blur-xl hover:bg-neutral-900/75 focus:outline-none focus:ring-2 focus:ring-white/25"
               >
                 ARMES
               </button>

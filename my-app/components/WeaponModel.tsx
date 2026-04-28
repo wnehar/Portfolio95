@@ -49,6 +49,7 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
 
   const tmp = useMemo(() => new THREE.Vector3(), [])
   const adsOffset = useMemo(() => new THREE.Vector3(0.10, 0.07, 0.16), [])
+  const swayRef = useRef(new THREE.Vector3())
   const model = useMemo(() => {
     const cloned = scene.clone(true)
     cloned.traverse((obj) => {
@@ -99,10 +100,9 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
     }
   }, [weapon])
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     if (!groupRef.current) return
 
-    // Smooth ADS transition for sniper to keep reticle visibility clean.
     const aimTarget = weapon === "sniper" && aimingRef.current ? 1 : 0
     const t = 1 - Math.exp(-12 * delta)
     aimBlendRef.current = THREE.MathUtils.lerp(aimBlendRef.current, aimTarget, t)
@@ -112,11 +112,20 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
     if (weapon === "sniper" && aimBlendRef.current > 0.001) {
       tmp.lerp(adsOffset, aimBlendRef.current)
     }
+    const elapsed = state.clock.elapsedTime
+    const bobScale = 1 - aimBlendRef.current * 0.75
+    swayRef.current.set(
+      Math.sin(elapsed * 1.9) * 0.012 * bobScale,
+      Math.cos(elapsed * 2.8) * 0.008 * bobScale,
+      0
+    )
+    tmp.add(swayRef.current)
     tmp.applyQuaternion(camera.quaternion)
     groupRef.current.position.copy(camera.position).add(tmp)
 
     if (modelRef.current) {
       modelRef.current.rotation.copy(transform.rotation)
+      modelRef.current.rotation.y += Math.sin(elapsed * 1.4) * 0.015 * bobScale
       if (weapon === "sniper" && aimBlendRef.current > 0.001) {
         modelRef.current.rotation.x = THREE.MathUtils.lerp(transform.rotation.x, 0, aimBlendRef.current)
         modelRef.current.rotation.z = THREE.MathUtils.lerp(transform.rotation.z, 0, aimBlendRef.current)

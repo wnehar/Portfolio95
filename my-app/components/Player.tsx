@@ -165,7 +165,7 @@ export function Player({ weapon }: { weapon: WeaponKey }) {
     // Movement relative to yaw (ground plane)
     // In Three.js, forward is -Z by default, so we invert.
     forwardVec.set(-Math.sin(yawRef.current), 0, -Math.cos(yawRef.current)).normalize()
-    rightVec.set(forwardVec.z, 0, -forwardVec.x).normalize()
+    rightVec.set(-forwardVec.z, 0, forwardVec.x).normalize()
 
     direction.current.set(0, 0, 0)
     direction.current.addScaledVector(forwardVec, z)

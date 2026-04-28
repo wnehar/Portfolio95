@@ -247,29 +247,41 @@ export function Scene({
       camera={{ fov: 75, near: 0.1, far: 1000, position: [0, 2, 5] }}
       className="h-full w-full"
     >
-      <color attach="background" args={["#2a2d32"]} /> {/* Ciel gris foncé uniforme */}
-      {/* Ambiance très tamisée */}
-      <ambientLight intensity={0.12} />
+      <color attach="background" args={["#0a0c10"]} />
+      <ambientLight intensity={0.2} color="#b8d4ff" />
+      <hemisphereLight intensity={0.42} color="#d8e6ff" groundColor="#111111" />
 
-      {/* Brume légère pour donner de la présence aux faisceaux */}
-      <fog attach="fog" args={["#2a2d32", 10, 38]} />
+      <fog attach="fog" args={["#0a0c10", 8, 34]} />
       
       <Environment />
 
+      <directionalLight
+        position={[4, 8, 3]}
+        intensity={1.3}
+        color="#dbe8ff"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0001}
+      />
+      <directionalLight position={[-6, 5, -8]} intensity={0.45} color="#7cc7ff" />
+      <pointLight position={[0, 4.6, 2.2]} intensity={12} distance={16} decay={2} color="#f8fbff" />
+      <pointLight position={[-8.4, 2.2, -0.5]} intensity={7} distance={10} decay={2} color="#8be9fd" />
+      <pointLight position={[8.4, 2.2, -0.5]} intensity={7} distance={10} decay={2} color="#ff5c7a" />
+
       {/* Spotlights focalisés sur le centre de chaque cible */}
-      <TargetSpotlight lightPosition={[-3, 5, -2]} targetPosition={[-3, 1.5, -5]} />
-      <TargetSpotlight lightPosition={[0, 5, -2]} targetPosition={[0, 1.5, -5]} />
-      <TargetSpotlight lightPosition={[3, 5, -2]} targetPosition={[3, 1.5, -5]} />
+      <TargetSpotlight lightPosition={[-3, 5.2, -2.4]} targetPosition={[-3, 1.5, -5]} />
+      <TargetSpotlight lightPosition={[0, 5.2, -2.4]} targetPosition={[0, 1.5, -5]} />
+      <TargetSpotlight lightPosition={[3, 5.2, -2.4]} targetPosition={[3, 1.5, -5]} />
 
       {/* Faisceaux visibles (cône volumétrique léger) */}
-      <LightBeam lightPosition={[-3, 5, -2]} targetPosition={[-3, 1.5, -5]} opacity={0.06} />
-      <LightBeam lightPosition={[0, 5, -2]} targetPosition={[0, 1.5, -5]} opacity={0.06} />
-      <LightBeam lightPosition={[3, 5, -2]} targetPosition={[3, 1.5, -5]} opacity={0.06} />
+      <LightBeam lightPosition={[-3, 5.2, -2.4]} targetPosition={[-3, 1.5, -5]} opacity={0.08} color="#ffd8df" />
+      <LightBeam lightPosition={[0, 5.2, -2.4]} targetPosition={[0, 1.5, -5]} opacity={0.08} color="#ffe5ef" />
+      <LightBeam lightPosition={[3, 5.2, -2.4]} targetPosition={[3, 1.5, -5]} opacity={0.08} color="#ffd8df" />
 
       {/* Néon rouge émanant du centre de chaque cible */}
-      <pointLight position={[-3, 1.5, -4.9]} intensity={3.5} distance={6} decay={2} color="#ff1744" />
-      <pointLight position={[0, 1.5, -4.9]} intensity={3.5} distance={6} decay={2} color="#ff1744" />
-      <pointLight position={[3, 1.5, -4.9]} intensity={3.5} distance={6} decay={2} color="#ff1744" />
+      <pointLight position={[-3, 1.5, -4.9]} intensity={5.2} distance={7} decay={2} color="#ff1744" />
+      <pointLight position={[0, 1.5, -4.9]} intensity={5.2} distance={7} decay={2} color="#ff1744" />
+      <pointLight position={[3, 1.5, -4.9]} intensity={5.2} distance={7} decay={2} color="#ff1744" />
       
       {/* 3 cibles alignées face au joueur (z=-5 est à 10 mètres de z=5) */}
       <Target targetKey="about" position={[-3, 0, -5]} onFallen={onTargetFallen} />
@@ -287,9 +299,8 @@ export function Scene({
       />
       <CameraRecoil recoilDebtRef={recoilDebtRef} returnSpeedRef={recoilReturnSpeedRef} />
 
-      {/* Bloom léger sur les zones néon (emissive) */}
       <EffectComposer multisampling={0}>
-        <Bloom intensity={0.35} luminanceThreshold={0.55} luminanceSmoothing={0.2} />
+        <Bloom intensity={0.6} luminanceThreshold={0.42} luminanceSmoothing={0.22} />
       </EffectComposer>
     </Canvas>
   )

@@ -80,21 +80,43 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
 
   return (
     <group position={position}>
+      <mesh position={[0, 1.4, -0.22]} castShadow receiveShadow>
+        <boxGeometry args={[2.45, 2.8, 0.22]} />
+        <meshStandardMaterial color="#161a20" roughness={0.42} metalness={0.62} />
+      </mesh>
+      <mesh position={[0, 1.4, -0.1]} castShadow receiveShadow>
+        <boxGeometry args={[2.05, 2.45, 0.08]} />
+        <meshStandardMaterial color="#262d35" roughness={0.34} metalness={0.74} />
+      </mesh>
+      <mesh position={[0, 2.78, -0.08]} castShadow receiveShadow>
+        <boxGeometry args={[1.3, 0.18, 0.12]} />
+        <meshStandardMaterial
+          color="#ff4d6d"
+          emissive="#ff4d6d"
+          emissiveIntensity={1.6}
+          roughness={0.25}
+          metalness={0.22}
+        />
+      </mesh>
+
       {/* Pivot group at the base (y=0) */}
       <group ref={groupRef}>
-        {/* Support post (acier usé) */}
+        <mesh position={[0, 0.16, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.58, 0.72, 0.18, 28]} />
+          <meshStandardMaterial color="#3f454d" roughness={0.48} metalness={0.82} />
+        </mesh>
+
+        {/* Support post */}
         <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.2, 1, 0.2]} />
           <meshStandardMaterial color="#6a6f75" roughness={0.65} metalness={0.8} />
         </mesh>
 
-        {/* Base plate */}
         <mesh position={[0, 0.02, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.9, 0.04, 0.9]} />
           <meshStandardMaterial color="#5f666d" roughness={0.7} metalness={0.85} />
         </mesh>
 
-        {/* Angled supports (worn steel) */}
         <mesh position={[-0.28, 0.6, 0]} rotation={[0, 0, Math.PI / 10]} castShadow receiveShadow>
           <boxGeometry args={[0.08, 0.95, 0.08]} />
           <meshStandardMaterial color="#70767d" roughness={0.72} metalness={0.75} />
@@ -104,8 +126,6 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
           <meshStandardMaterial color="#70767d" roughness={0.72} metalness={0.75} />
         </mesh>
         
-        {/* Circular target at the top of the post */}
-        {/* We use a cylinder to have a thick circle, rotated 90 degrees so it faces Z */}
         <mesh 
           position={[0, 1.5, 0.1]} 
           rotation={[Math.PI / 2, 0, 0]} 

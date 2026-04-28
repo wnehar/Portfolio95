@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Scene } from "@/components/Scene";
 import { InfoModal } from "@/components/InfoModal";
@@ -7,6 +8,7 @@ import type { TargetKey } from "@/components/Target";
 import { WEAPONS, type WeaponKey } from "@/components/weapons";
 
 export default function Home() {
+  const [hasStarted, setHasStarted] = useState(false);
   const [openKey, setOpenKey] = useState<TargetKey | null>(null);
   const [weapon, setWeapon] = useState<WeaponKey>("pistol");
   const [weaponsOpen, setWeaponsOpen] = useState(false);
@@ -28,17 +30,62 @@ export default function Home() {
       about: {
         title: "À propos",
         body: (
-          <>
-            <p>
-              Je conçois et développe des expériences web interactives, avec un
-              goût pour les interfaces propres, les animations subtiles et la
-              performance.
-            </p>
-            <p>
-              Mon objectif: transformer une idée en un produit clair, utile et
-              agréable à utiliser.
-            </p>
-          </>
+          <div className="grid gap-5 md:grid-cols-[280px_minmax(0,1fr)] md:items-start">
+            <div className="overflow-hidden rounded-[24px] border border-white/10 bg-white/5 shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+              <div className="border-b border-white/10 bg-white/6 px-4 py-3 text-[11px] uppercase tracking-[0.3em] text-white/55">
+                Profil
+              </div>
+              <Image
+                src="/william-nehar.png"
+                alt="Portrait de William Nehar"
+                width={900}
+                height={900}
+                className="h-[360px] w-full object-cover object-center"
+                priority
+              />
+            </div>
+
+            <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+              <div className="mb-4">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Identification</p>
+                <h3 className="mt-2 text-2xl font-semibold text-white">William Nehar</h3>
+                <p className="mt-1 text-white/60">Profil personnel</p>
+              </div>
+
+              <div className="grid gap-3">
+                <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Nom</p>
+                  <p className="mt-1 text-base font-medium text-white">NEHAR</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Prenom</p>
+                  <p className="mt-1 text-base font-medium text-white">William</p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Age</p>
+                    <p className="mt-1 text-base font-medium text-white">19 ans</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Date de naissance</p>
+                    <p className="mt-1 text-base font-medium text-white">28/04/2007</p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-white/45">Domicile</p>
+                  <p className="mt-1 text-base font-medium leading-relaxed text-white">
+                    1 rue chateaubriand
+                    <br />
+                    95330 DOMONT
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         ),
       },
       skills: {
@@ -126,102 +173,161 @@ export default function Home() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black">
-      {/* 3D Scene */}
-      <Scene
-        weapon={weapon}
-        onTargetFallen={handleTargetFallen}
-        onShot={handleShot}
-        onHit={handleHit}
-      />
-      
-      {/* UI Overlay */}
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-        {/* Crosshair */}
-        <div className="relative flex h-6 w-6 items-center justify-center mix-blend-difference">
-          <div className="absolute h-full w-[2px] bg-white" />
-          <div className="absolute h-[2px] w-full bg-white" />
-        </div>
-      </div>
+      {hasStarted ? (
+        <>
+          <Scene
+            weapon={weapon}
+            onTargetFallen={handleTargetFallen}
+            onShot={handleShot}
+            onHit={handleHit}
+          />
 
-      {hitFlash && (
-        <div className="pointer-events-none absolute inset-0 z-30 bg-white/5">
-          <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 text-center text-white/95">
-            ✦
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <div className="relative flex h-6 w-6 items-center justify-center mix-blend-difference">
+              <div className="absolute h-full w-[2px] bg-white" />
+              <div className="absolute h-[2px] w-full bg-white" />
+            </div>
           </div>
-        </div>
-      )}
 
-      {openKey && (
-        <InfoModal
-          title={contentByTarget[openKey].title}
-          onClose={() => setOpenKey(null)}
-        >
-          {contentByTarget[openKey].body}
-        </InfoModal>
-      )}
-      
-      {/* Instructions Overlay */}
-      <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-white/80 mix-blend-difference">
-        <p className="mb-2 text-sm uppercase tracking-widest font-bold">Contrôles</p>
-        <div className="flex gap-6 text-xs font-mono">
-          <span>ZQSD / WASD : Déplacement</span>
-          <span>Souris : Caméra</span>
-          <span>Clic : Verrouiller / Jouer</span>
-          <span>Échap : Quitter</span>
-        </div>
-      </div>
-
-      {/* Arcade HUD */}
-      <div className="pointer-events-none fixed left-6 top-6 z-40 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-white/90 shadow-xl backdrop-blur-md">
-        <div className="mb-1 text-[11px] uppercase tracking-[0.25em] text-white/55">Arcade</div>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-          <span>Score</span>
-          <span className="text-right font-semibold">{score}</span>
-          <span>Précision</span>
-          <span className="text-right font-semibold">{accuracy}%</span>
-          <span>Streak</span>
-          <span className="text-right font-semibold">x{streak}</span>
-          <span>Arme</span>
-          <span className="text-right font-semibold">{WEAPONS[weapon].label}</span>
-        </div>
-        <div className="mt-2 border-t border-white/10 pt-2 text-xs text-white/60">
-          Meilleur score: <span className="font-semibold text-white/80">{bestScore}</span>
-        </div>
-      </div>
-
-      {/* Weapons UI (bottom-right) */}
-      <div className="pointer-events-auto fixed bottom-6 right-6 z-40">
-        <div className="relative">
-          {weaponsOpen && (
-            <div className="absolute bottom-14 right-0 w-44 overflow-hidden rounded-xl border border-white/10 bg-neutral-950/85 shadow-2xl backdrop-blur">
-              {(["pistol", "ak47", "sniper"] as WeaponKey[]).map((k) => (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => {
-                    setWeapon(k);
-                    setWeaponsOpen(false);
-                  }}
-                  className={`flex w-full items-center justify-between px-4 py-3 text-sm text-white/85 hover:bg-white/10 ${
-                    weapon === k ? "bg-white/10" : ""
-                  }`}
-                >
-                  <span>{WEAPONS[k].label}</span>
-                  {weapon === k && <span className="text-xs text-white/60">Actif</span>}
-                </button>
-              ))}
+          {hitFlash && (
+            <div className="pointer-events-none absolute inset-0 z-30 bg-white/5">
+              <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 text-center text-white/95">
+                ✦
+              </div>
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => setWeaponsOpen((v) => !v)}
-            className="h-12 w-24 rounded-xl border border-white/15 bg-neutral-950/70 text-xs font-semibold tracking-widest text-white/90 shadow-lg backdrop-blur hover:bg-neutral-900/70 focus:outline-none focus:ring-2 focus:ring-white/25"
-          >
-            ARMES
-          </button>
-        </div>
-      </div>
+          {openKey && (
+            <InfoModal
+              title={contentByTarget[openKey].title}
+              onClose={() => setOpenKey(null)}
+            >
+              {contentByTarget[openKey].body}
+            </InfoModal>
+          )}
+
+          <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-white/80 mix-blend-difference">
+            <p className="mb-2 text-sm uppercase tracking-widest font-bold">Contrôles</p>
+            <div className="flex gap-6 text-xs font-mono">
+              <span>ZQSD / WASD : Déplacement</span>
+              <span>Souris : Caméra</span>
+              <span>Clic : Verrouiller / Jouer</span>
+              <span>Échap : Quitter</span>
+            </div>
+          </div>
+
+          <div className="pointer-events-none fixed left-6 top-6 z-40 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-white/90 shadow-xl backdrop-blur-md">
+            <div className="mb-1 text-[11px] uppercase tracking-[0.25em] text-white/55">Arcade</div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+              <span>Score</span>
+              <span className="text-right font-semibold">{score}</span>
+              <span>Précision</span>
+              <span className="text-right font-semibold">{accuracy}%</span>
+              <span>Streak</span>
+              <span className="text-right font-semibold">x{streak}</span>
+              <span>Arme</span>
+              <span className="text-right font-semibold">{WEAPONS[weapon].label}</span>
+            </div>
+            <div className="mt-2 border-t border-white/10 pt-2 text-xs text-white/60">
+              Meilleur score: <span className="font-semibold text-white/80">{bestScore}</span>
+            </div>
+          </div>
+
+          <div className="pointer-events-auto fixed bottom-6 right-6 z-40">
+            <div className="relative">
+              {weaponsOpen && (
+                <div className="absolute bottom-14 right-0 w-44 overflow-hidden rounded-xl border border-white/10 bg-neutral-950/85 shadow-2xl backdrop-blur">
+                  {(["pistol", "ak47", "sniper"] as WeaponKey[]).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => {
+                        setWeapon(k);
+                        setWeaponsOpen(false);
+                      }}
+                      className={`flex w-full items-center justify-between px-4 py-3 text-sm text-white/85 hover:bg-white/10 ${
+                        weapon === k ? "bg-white/10" : ""
+                      }`}
+                    >
+                      <span>{WEAPONS[k].label}</span>
+                      {weapon === k && <span className="text-xs text-white/60">Actif</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setWeaponsOpen((v) => !v)}
+                className="h-12 w-24 rounded-xl border border-white/15 bg-neutral-950/70 text-xs font-semibold tracking-widest text-white/90 shadow-lg backdrop-blur hover:bg-neutral-900/70 focus:outline-none focus:ring-2 focus:ring-white/25"
+              >
+                ARMES
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(190,24,93,0.24),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.14),transparent_28%),linear-gradient(180deg,#090909_0%,#111111_50%,#050505_100%)] px-6 text-white">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:90px_90px] opacity-30" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500/10 blur-3xl" />
+
+          <div className="relative z-10 w-full max-w-6xl">
+            <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+              <div className="rounded-[32px] border border-white/10 bg-black/35 p-8 shadow-[0_30px_100px_rgba(0,0,0,0.45)] backdrop-blur-xl md:p-10">
+                <p className="text-[11px] uppercase tracking-[0.45em] text-red-300/80">Portfolio experience</p>
+                <h1 className="mt-4 max-w-2xl text-5xl font-semibold leading-tight md:text-7xl">
+                  Entrez dans le lobby avant la partie.
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-7 text-white/70 md:text-lg">
+                  Un portfolio jouable en mode stand de tir. Explorez les cibles, découvrez le profil,
+                  les competences et les contacts dans une ambiance arcade.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setHasStarted(true)}
+                    className="rounded-full border border-red-400/35 bg-red-500/20 px-8 py-4 text-sm font-semibold uppercase tracking-[0.28em] text-white shadow-[0_0_40px_rgba(239,68,68,0.22)] transition hover:bg-red-500/30 focus:outline-none focus:ring-2 focus:ring-red-300/40"
+                  >
+                    Jouer
+                  </button>
+                  <div className="rounded-full border border-white/10 bg-white/5 px-5 py-4 text-sm uppercase tracking-[0.2em] text-white/60">
+                    Best score: {bestScore}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Mode de jeu</p>
+                  <h2 className="mt-3 text-2xl font-semibold">Stand de tir interactif</h2>
+                  <p className="mt-3 text-sm leading-6 text-white/65">
+                    Touchez les cibles pour ouvrir les fiches et naviguer dans le portfolio comme dans une vraie session arcade.
+                  </p>
+                </div>
+
+                <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Controles</p>
+                  <div className="mt-4 space-y-3 text-sm text-white/80">
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <span>Deplacement</span>
+                      <span className="font-mono text-white/60">ZQSD / WASD</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <span>Viser</span>
+                      <span className="font-mono text-white/60">Souris</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <span>Tirer / entrer</span>
+                      <span className="font-mono text-white/60">Clic gauche</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

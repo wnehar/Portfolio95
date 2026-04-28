@@ -19,41 +19,60 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
   const [isHit, setIsHit] = useState(false)
   const [impactPoint, setImpactPoint] = useState<THREE.Vector3 | null>(null)
   const hitTimeRef = useRef<number | null>(null)
+  const revealTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!isHit) return
     hitTimeRef.current = performance.now()
+    revealTimeoutRef.current = window.setTimeout(() => {
+      onFallen?.(targetKey)
+      revealTimeoutRef.current = null
+    }, 220)
     const t = window.setTimeout(() => {
       setIsHit(false)
       setImpactPoint(null)
     }, 5000)
 
-    return () => window.clearTimeout(t)
-  }, [isHit])
+    return () => {
+      window.clearTimeout(t)
+      if (revealTimeoutRef.current) {
+        window.clearTimeout(revealTimeoutRef.current)
+        revealTimeoutRef.current = null
+      }
+    }
+  }, [isHit, onFallen, targetKey])
 
   // Use useFrame to animate the backward rotation smoothly
   useFrame((state, delta) => {
     if (!groupRef.current) return
     
     // -Math.PI / 2 means 90 degrees backwards around X-axis
-    const targetRotationX = isHit ? -Math.PI / 2 : 0
+    let targetRotationX = 0
+    const hitTime = hitTimeRef.current
+    const elapsed = hitTime ? (performance.now() - hitTime) / 1000 : 999
+    if (isHit) {
+      if (elapsed < 0.08) {
+        targetRotationX = 0.12
+      } else if (elapsed < 0.18) {
+        targetRotationX = -0.1
+      } else {
+        targetRotationX = -Math.PI / 2
+      }
+    }
     groupRef.current.rotation.x = THREE.MathUtils.lerp(
       groupRef.current.rotation.x,
       targetRotationX,
-      22 * delta
+      14 * delta
     )
 
-    // Small energetic vibration right after impact
-    const hitTime = hitTimeRef.current
-    const elapsed = hitTime ? (performance.now() - hitTime) / 1000 : 999
     if (elapsed < 0.18) {
       const p = 1 - elapsed / 0.18
-      const amp = 0.08 * p
-      groupRef.current.rotation.z = Math.sin(elapsed * 70) * amp
-      groupRef.current.rotation.y = Math.cos(elapsed * 90) * amp * 0.6
+      const amp = 0.16 * p
+      groupRef.current.rotation.z = Math.sin(elapsed * 95) * amp
+      groupRef.current.rotation.y = Math.cos(elapsed * 115) * amp * 0.75
     } else {
-      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, 0, 18 * delta)
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 18 * delta)
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, 0, 12 * delta)
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 12 * delta)
     }
 
     if (plateGlowRef.current) {
@@ -67,7 +86,6 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
   const handleHit = (point: THREE.Vector3) => {
     if (!isHit) {
       setIsHit(true)
-      onFallen?.(targetKey)
       // On sauvegarde le point d'impact (dans l'espace monde) pour générer les étincelles
       // Comme la Target elle-même va pivoter, on pourrait vouloir placer les étincelles globalement
       // Mais comme elles disparaissent vite, on peut simplement les attacher à la scène via le Player

@@ -46,7 +46,15 @@ export const usePlayerControls = () => {
   return movement
 }
 
-export function Player({ weapon }: { weapon: WeaponKey }) {
+export function Player({
+  weapon,
+  sniperScoped = false,
+  onSniperScopeChange,
+}: {
+  weapon: WeaponKey
+  sniperScoped?: boolean
+  onSniperScopeChange?: (next: boolean) => void
+}) {
   const { forward, backward, left, right } = usePlayerControls()
   const { camera, gl } = useThree()
   const cameraRef = useRef<THREE.Camera | null>(null)
@@ -64,7 +72,6 @@ export function Player({ weapon }: { weapon: WeaponKey }) {
   const pitchRef = useRef(0)
   const yawTargetRef = useRef(0)
   const pitchTargetRef = useRef(0)
-  const zoomingRef = useRef(false)
   const fovTargetRef = useRef(75)
 
   useEffect(() => {
@@ -104,12 +111,12 @@ export function Player({ weapon }: { weapon: WeaponKey }) {
       if (e.button !== 2) return
       if (!isLockedRef.current) return
       if (weapon !== "sniper") return
-      zoomingRef.current = true
+      onSniperScopeChange?.(true)
     }
 
     const onMouseUp = (e: MouseEvent) => {
       if (e.button !== 2) return
-      zoomingRef.current = false
+      onSniperScopeChange?.(false)
     }
 
     dom.addEventListener("pointerdown", onPointerDown)
@@ -127,7 +134,7 @@ export function Player({ weapon }: { weapon: WeaponKey }) {
       document.removeEventListener("mousedown", onMouseDown)
       document.removeEventListener("mouseup", onMouseUp)
     }
-  }, [weapon])
+  }, [onSniperScopeChange, weapon])
 
   useFrame((state, delta) => {
     if (!isLockedRef.current) return
@@ -147,7 +154,7 @@ export function Player({ weapon }: { weapon: WeaponKey }) {
     // Zoom (sniper RMB)
     const baseFov = 75
     const zoomCfg = WEAPONS[weapon].zoom
-    const desired = zoomCfg?.enabled && zoomingRef.current ? zoomCfg.fov : baseFov
+    const desired = zoomCfg?.enabled && sniperScoped ? zoomCfg.fov : baseFov
     const zoomDamping = zoomCfg?.enabled ? zoomCfg.damping : 12
     fovTargetRef.current = desired
 

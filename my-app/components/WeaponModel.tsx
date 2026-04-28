@@ -18,6 +18,7 @@ const WEAPON_TRANSFORMS: Record<
     offset: THREE.Vector3
     rotation: THREE.Euler
     scale: number
+    adsOffset?: THREE.Vector3
   }
 > = {
   pistol: {
@@ -26,18 +27,25 @@ const WEAPON_TRANSFORMS: Record<
     scale: 0.22,
   },
   ak47: {
-    offset: new THREE.Vector3(0.27, -0.32, -0.60),
-    rotation: new THREE.Euler(0.065, Math.PI, 0.03),
-    scale: 0.16,
+    offset: new THREE.Vector3(0.34, -0.34, -0.82),
+    rotation: new THREE.Euler(0.04, Math.PI - 0.22, 0.08),
+    scale: 0.135,
   },
   sniper: {
-    offset: new THREE.Vector3(0.29, -0.35, -0.70),
-    rotation: new THREE.Euler(0.03, Math.PI, 0.015),
-    scale: 0.145,
+    offset: new THREE.Vector3(0.36, -0.28, -1.02),
+    rotation: new THREE.Euler(-0.01, Math.PI - 0.09, 0.015),
+    scale: 0.115,
+    adsOffset: new THREE.Vector3(0.005, -0.01, -0.22),
   },
 }
 
-export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
+export function WeaponModel({
+  weapon,
+  sniperScoped = false,
+}: {
+  weapon: WeaponKey
+  sniperScoped?: boolean
+}) {
   const groupRef = useRef<THREE.Group>(null)
   const modelRef = useRef<THREE.Group>(null)
   const { camera } = useThree()
@@ -48,7 +56,6 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
   const offset = transform.offset
 
   const tmp = useMemo(() => new THREE.Vector3(), [])
-  const adsOffset = useMemo(() => new THREE.Vector3(0.10, 0.07, 0.16), [])
   const swayRef = useRef(new THREE.Vector3())
   const model = useMemo(() => {
     const cloned = scene.clone(true)
@@ -103,14 +110,14 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
   useFrame((state, delta) => {
     if (!groupRef.current) return
 
-    const aimTarget = weapon === "sniper" && aimingRef.current ? 1 : 0
+    const aimTarget = weapon === "sniper" && (aimingRef.current || sniperScoped) ? 1 : 0
     const t = 1 - Math.exp(-12 * delta)
     aimBlendRef.current = THREE.MathUtils.lerp(aimBlendRef.current, aimTarget, t)
 
     groupRef.current.quaternion.copy(camera.quaternion)
     tmp.copy(offset)
     if (weapon === "sniper" && aimBlendRef.current > 0.001) {
-      tmp.lerp(adsOffset, aimBlendRef.current)
+      tmp.lerp(transform.adsOffset ?? new THREE.Vector3(), aimBlendRef.current)
     }
     const elapsed = state.clock.elapsedTime
     const bobScale = 1 - aimBlendRef.current * 0.75
@@ -124,10 +131,12 @@ export function WeaponModel({ weapon }: { weapon: WeaponKey }) {
     groupRef.current.position.copy(camera.position).add(tmp)
 
     if (modelRef.current) {
+      modelRef.current.visible = !(weapon === "sniper" && aimBlendRef.current > 0.92)
       modelRef.current.rotation.copy(transform.rotation)
       modelRef.current.rotation.y += Math.sin(elapsed * 1.4) * 0.015 * bobScale
       if (weapon === "sniper" && aimBlendRef.current > 0.001) {
-        modelRef.current.rotation.x = THREE.MathUtils.lerp(transform.rotation.x, 0, aimBlendRef.current)
+        modelRef.current.rotation.x = THREE.MathUtils.lerp(transform.rotation.x, -0.002, aimBlendRef.current)
+        modelRef.current.rotation.y = THREE.MathUtils.lerp(transform.rotation.y, Math.PI, aimBlendRef.current)
         modelRef.current.rotation.z = THREE.MathUtils.lerp(transform.rotation.z, 0, aimBlendRef.current)
       }
       modelRef.current.scale.setScalar(transform.scale)

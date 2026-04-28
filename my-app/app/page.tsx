@@ -6,11 +6,13 @@ import { Scene } from "@/components/Scene";
 import { InfoModal } from "@/components/InfoModal";
 import type { TargetKey } from "@/components/Target";
 import { WEAPONS, type WeaponKey } from "@/components/weapons";
+import { useAmbientAudio } from "@/components/useAmbientAudio";
 
 export default function Home() {
   const [hasStarted, setHasStarted] = useState(false);
   const [openKey, setOpenKey] = useState<TargetKey | null>(null);
   const [weapon, setWeapon] = useState<WeaponKey>("pistol");
+  const [sniperScoped, setSniperScoped] = useState(false);
   const [weaponsOpen, setWeaponsOpen] = useState(false);
   const [shots, setShots] = useState(0);
   const [hits, setHits] = useState(0);
@@ -22,8 +24,11 @@ export default function Home() {
     return saved ? Number(saved) || 0 : 0;
   });
   const [hitFlash, setHitFlash] = useState(false);
+  const [completedTargets, setCompletedTargets] = useState<TargetKey[]>([]);
+  const [showSessionSummary, setShowSessionSummary] = useState(false);
   const streakResetRef = useRef<number | null>(null);
   const hitFlashRef = useRef<number | null>(null);
+  const { start: startAmbient, stop: stopAmbient } = useAmbientAudio();
 
   const contentByTarget = useMemo(() => {
     return {
@@ -126,6 +131,7 @@ export default function Home() {
 
   const handleTargetFallen = useCallback((targetKey: TargetKey) => {
     setOpenKey(targetKey);
+    setCompletedTargets((prev) => (prev.includes(targetKey) ? prev : [...prev, targetKey]));
   }, []);
 
   const updateBestScore = useCallback((nextScore: number) => {
@@ -169,7 +175,22 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    startAmbient(hasStarted ? "game" : "lobby");
+    return () => stopAmbient();
+  }, [hasStarted, startAmbient, stopAmbient]);
+
+  useEffect(() => {
+    if (completedTargets.length === 3) {
+      setShowSessionSummary(true);
+    }
+  }, [completedTargets]);
+
   const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
+
+  useEffect(() => {
+    if (weapon !== "sniper") setSniperScoped(false);
+  }, [weapon]);
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black">
@@ -181,10 +202,12 @@ export default function Home() {
             onShot={handleShot}
             onHit={handleHit}
             shotCount={shots}
+            sniperScoped={sniperScoped}
+            onSniperScopeChange={setSniperScoped}
           />
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <div className="relative flex h-10 w-10 items-center justify-center">
+            <div className={`relative flex items-center justify-center transition ${sniperScoped ? "h-0 w-0 opacity-0" : "h-10 w-10 opacity-100"}`}>
               <div className="absolute h-10 w-10 rounded-full border border-white/8 bg-white/[0.02] backdrop-blur-[1px]" />
               <div className="absolute h-5 w-5 rounded-full border border-red-400/25" />
               <div className="absolute h-full w-px bg-gradient-to-b from-transparent via-white/90 to-transparent" />
@@ -192,6 +215,23 @@ export default function Home() {
               <div className="absolute h-1.5 w-1.5 rounded-full bg-red-400/90 shadow-[0_0_14px_rgba(248,113,113,0.9)]" />
             </div>
           </div>
+
+          {weapon === "sniper" && sniperScoped && (
+            <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/78" />
+              <div className="relative h-[72vh] w-[72vh] max-h-[820px] max-w-[820px] overflow-hidden rounded-full border border-black shadow-[0_0_0_9999px_rgba(0,0,0,0.78)]">
+                <div className="absolute inset-0 rounded-full border border-black/70" />
+                <div className="absolute inset-x-1/2 top-0 h-full w-px -translate-x-1/2 bg-black/90" />
+                <div className="absolute inset-y-1/2 left-0 h-px w-full -translate-y-1/2 bg-black/90" />
+                <div className="absolute inset-x-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black/80" />
+                <div className="absolute inset-x-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500" />
+                <div className="absolute left-1/2 top-0 h-10 w-px -translate-x-1/2 bg-red-500/85" />
+                <div className="absolute bottom-0 left-1/2 h-10 w-px -translate-x-1/2 bg-red-500/85" />
+                <div className="absolute left-0 top-1/2 h-px w-10 -translate-y-1/2 bg-red-500/85" />
+                <div className="absolute right-0 top-1/2 h-px w-10 -translate-y-1/2 bg-red-500/85" />
+              </div>
+            </div>
+          )}
 
           {hitFlash && (
             <div className="pointer-events-none absolute inset-0 z-30 bg-white/5">
@@ -207,6 +247,62 @@ export default function Home() {
               onClose={() => setOpenKey(null)}
             >
               {contentByTarget[openKey].body}
+            </InfoModal>
+          )}
+
+          {showSessionSummary && (
+            <InfoModal
+              title="Session terminée"
+              onClose={() => setShowSessionSummary(false)}
+            >
+              <div className="space-y-4">
+                <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-red-300/75">Performance</p>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Score</p>
+                      <p className="mt-1 text-xl font-semibold text-white">{score}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Précision</p>
+                      <p className="mt-1 text-xl font-semibold text-white">{accuracy}%</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Coups tirés</p>
+                      <p className="mt-1 text-xl font-semibold text-white">{shots}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Best streak</p>
+                      <p className="mt-1 text-xl font-semibold text-white">x{streak}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowSessionSummary(false)}
+                    className="rounded-full border border-red-400/30 bg-red-500/15 px-5 py-3 text-sm font-semibold tracking-[0.18em] text-white hover:bg-red-500/25"
+                  >
+                    Continuer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowSessionSummary(false);
+                      setCompletedTargets([]);
+                      setOpenKey(null);
+                      setShots(0);
+                      setHits(0);
+                      setScore(0);
+                      setStreak(0);
+                    }}
+                    className="rounded-full border border-white/12 bg-white/6 px-5 py-3 text-sm font-semibold tracking-[0.18em] text-white/85 hover:bg-white/10"
+                  >
+                    Nouvelle session
+                  </button>
+                </div>
+              </div>
             </InfoModal>
           )}
 
@@ -235,6 +331,9 @@ export default function Home() {
             </div>
             <div className="mt-2 border-t border-white/10 pt-2 text-xs text-white/60">
               Meilleur score: <span className="font-semibold text-white/80">{bestScore}</span>
+            </div>
+            <div className="mt-2 border-t border-white/10 pt-2 text-xs text-white/60">
+              Cibles: <span className="font-semibold text-white/80">{completedTargets.length}/3</span>
             </div>
           </div>
 
@@ -270,61 +369,105 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          {weapon === "sniper" && (
+            <div className="pointer-events-auto fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
+              <button
+                type="button"
+                onClick={() => setSniperScoped((v) => !v)}
+                className={`rounded-full border px-6 py-3 text-xs font-semibold tracking-[0.28em] shadow-lg backdrop-blur-xl transition focus:outline-none focus:ring-2 focus:ring-white/25 ${
+                  sniperScoped
+                    ? "border-red-400/35 bg-red-500/20 text-white"
+                    : "border-white/15 bg-neutral-950/75 text-white/90 hover:bg-neutral-900/75"
+                }`}
+              >
+                {sniperScoped ? "QUITTER LE VISEUR" : "VISEUR"}
+              </button>
+            </div>
+          )}
         </>
       ) : (
-        <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(190,24,93,0.24),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.14),transparent_28%),linear-gradient(180deg,#090909_0%,#111111_50%,#050505_100%)] px-6 text-white">
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:90px_90px] opacity-30" />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500/10 blur-3xl" />
+        <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,82,119,0.18),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(107,187,255,0.14),transparent_26%),linear-gradient(180deg,#06080b_0%,#0c1016_45%,#040507_100%)] px-6 text-white">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:110px_110px] opacity-40" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/6 bg-white/[0.02] blur-3xl" />
+          <div className="pointer-events-none absolute inset-x-0 top-[16%] mx-auto h-px max-w-5xl bg-gradient-to-r from-transparent via-red-300/40 to-transparent" />
 
           <div className="relative z-10 w-full max-w-6xl">
-            <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="rounded-[32px] border border-white/10 bg-black/35 p-8 shadow-[0_30px_100px_rgba(0,0,0,0.45)] backdrop-blur-xl md:p-10">
-                <p className="text-[11px] uppercase tracking-[0.45em] text-red-300/80">Portfolio experience</p>
-                <h1 className="mt-4 max-w-2xl text-5xl font-semibold leading-tight md:text-7xl">
-                  Entrez dans le lobby avant la partie.
+            <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-[36px] border border-white/10 bg-black/35 p-8 shadow-[0_35px_120px_rgba(0,0,0,0.5)] backdrop-blur-2xl md:p-12">
+                <p className="text-[11px] uppercase tracking-[0.5em] text-red-300/75">William Nehar</p>
+                <h1 className="mt-5 text-5xl font-semibold leading-[0.95] md:text-7xl">
+                  Shooting
+                  <br />
+                  Portfolio
                 </h1>
-                <p className="mt-5 max-w-xl text-base leading-7 text-white/70 md:text-lg">
-                  Un portfolio jouable en mode stand de tir. Explorez les cibles, découvrez le profil,
-                  les competences et les contacts dans une ambiance arcade.
+                <p className="mt-6 max-w-2xl text-base leading-7 text-white/68 md:text-lg">
+                  Entrez dans une experience interactive inspiree d’un vrai menu de jeu.
+                  Explorez le stand, touchez les cibles et decouvrez le portfolio dans une ambiance plus immersive.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-4">
                   <button
                     type="button"
                     onClick={() => setHasStarted(true)}
-                    className="rounded-full border border-red-400/35 bg-red-500/20 px-8 py-4 text-sm font-semibold uppercase tracking-[0.28em] text-white shadow-[0_0_40px_rgba(239,68,68,0.22)] transition hover:bg-red-500/30 focus:outline-none focus:ring-2 focus:ring-red-300/40"
+                    className="rounded-full border border-red-400/30 bg-[linear-gradient(180deg,rgba(255,95,126,0.38),rgba(174,26,57,0.42))] px-9 py-4 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-[0_0_45px_rgba(239,68,68,0.24)] transition hover:scale-[1.02] hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-red-300/40"
                   >
                     Jouer
                   </button>
-                  <div className="rounded-full border border-white/10 bg-white/5 px-5 py-4 text-sm uppercase tracking-[0.2em] text-white/60">
+                  <div className="rounded-full border border-white/10 bg-white/5 px-5 py-4 text-sm uppercase tracking-[0.22em] text-white/60">
                     Best score: {bestScore}
+                  </div>
+                </div>
+
+                <div className="mt-10 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-4">
+                    <p className="text-[11px] uppercase tracking-[0.25em] text-white/40">Mode</p>
+                    <p className="mt-2 text-sm font-medium text-white/88">Stand de tir</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-4">
+                    <p className="text-[11px] uppercase tracking-[0.25em] text-white/40">Objectif</p>
+                    <p className="mt-2 text-sm font-medium text-white/88">Trouver 3 cibles</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-4">
+                    <p className="text-[11px] uppercase tracking-[0.25em] text-white/40">Style</p>
+                    <p className="mt-2 text-sm font-medium text-white/88">Arcade premium</p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid gap-4">
-                <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Mode de jeu</p>
-                  <h2 className="mt-3 text-2xl font-semibold">Stand de tir interactif</h2>
-                  <p className="mt-3 text-sm leading-6 text-white/65">
-                    Touchez les cibles pour ouvrir les fiches et naviguer dans le portfolio comme dans une vraie session arcade.
-                  </p>
+              <div className="space-y-4">
+                <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] p-6 shadow-[0_25px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Briefing</p>
+                  <div className="mt-4 space-y-3">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-xs uppercase tracking-[0.22em] text-white/40">Experience</p>
+                      <p className="mt-1 text-sm text-white/82">Portfolio interactif en vue FPS.</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-xs uppercase tracking-[0.22em] text-white/40">Mission</p>
+                      <p className="mt-1 text-sm text-white/82">Touchez chaque cible pour debloquer les fiches.</p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                <div className="rounded-[30px] border border-white/10 bg-black/30 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl">
                   <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Controles</p>
-                  <div className="mt-4 space-y-3 text-sm text-white/80">
-                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                  <div className="mt-4 space-y-3 text-sm text-white/82">
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
                       <span>Deplacement</span>
                       <span className="font-mono text-white/60">ZQSD / WASD</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
-                      <span>Viser</span>
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                      <span>Camera</span>
                       <span className="font-mono text-white/60">Souris</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
-                      <span>Tirer / entrer</span>
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                      <span>Tir / entrer</span>
                       <span className="font-mono text-white/60">Clic gauche</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                      <span>Quitter</span>
+                      <span className="font-mono text-white/60">Echap</span>
                     </div>
                   </div>
                 </div>

@@ -11,55 +11,6 @@ import { WeaponModel } from "./WeaponModel"
 import { WEAPONS, type WeaponKey } from "./weapons"
 import { useGunSound } from "./useGunSound"
 
-function LightBeam({
-  lightPosition,
-  targetPosition,
-  radius = 0.7,
-  opacity = 0.07,
-  color = "#ffffff",
-}: {
-  lightPosition: [number, number, number]
-  targetPosition: [number, number, number]
-  radius?: number
-  opacity?: number
-  color?: string
-}) {
-  const meshRef = useRef<THREE.Mesh>(null)
-  const light = useMemo(() => new THREE.Vector3(...lightPosition), [lightPosition])
-  const target = useMemo(() => new THREE.Vector3(...targetPosition), [targetPosition])
-  const dir = useMemo(() => new THREE.Vector3(), [])
-  const up = useMemo(() => new THREE.Vector3(0, 1, 0), [])
-
-  useEffect(() => {
-    if (!meshRef.current) return
-    const height = light.distanceTo(target)
-    meshRef.current.position.set(...lightPosition)
-    // Place cone so its base ends at the target
-    meshRef.current.translateZ(-height / 2)
-
-    // Orient the cone from light -> target
-    dir.copy(target).sub(light).normalize()
-    const q = new THREE.Quaternion().setFromUnitVectors(up, dir)
-    meshRef.current.quaternion.copy(q)
-  }, [lightPosition, targetPosition, light, target, dir, up])
-
-  const height = light.distanceTo(target)
-
-  return (
-    <mesh ref={meshRef} renderOrder={2}>
-      <coneGeometry args={[radius, height, 24, 1, true]} />
-      <meshBasicMaterial
-        color={color}
-        transparent
-        opacity={opacity}
-        side={THREE.DoubleSide}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </mesh>
-  )
-}
-
 function CameraRecoil({
   recoilDebtRef,
   returnSpeedRef,
@@ -228,7 +179,7 @@ function WeaponShooter({
   return null
 }
 
-function TargetSpotlight({
+function TargetAccentLight({
   lightPosition,
   targetPosition,
 }: {
@@ -255,14 +206,14 @@ function TargetSpotlight({
       <spotLight
         ref={lightRef}
         position={lightPosition}
-        intensity={9}
-        angle={0.26}
-        penumbra={0.12}
-        distance={35}
+        intensity={5.2}
+        angle={0.42}
+        penumbra={0.65}
+        distance={24}
         decay={2}
-        color="#ffffff"
+        color="#ffe8ef"
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[1024, 1024]}
       />
       <object3D ref={targetRef} position={targetPosition} />
     </>
@@ -291,41 +242,37 @@ export function Scene({
       camera={{ fov: 75, near: 0.1, far: 1000, position: [0, 2, 5] }}
       className="h-full w-full"
     >
-      <color attach="background" args={["#0a0c10"]} />
-      <ambientLight intensity={0.2} color="#b8d4ff" />
-      <hemisphereLight intensity={0.42} color="#d8e6ff" groundColor="#111111" />
+      <color attach="background" args={["#10141a"]} />
+      <ambientLight intensity={0.34} color="#c5dcff" />
+      <hemisphereLight intensity={0.6} color="#e1ecff" groundColor="#1b1d22" />
 
-      <fog attach="fog" args={["#0a0c10", 8, 34]} />
+      <fog attach="fog" args={["#10141a", 11, 42]} />
       
       <Environment />
 
       <directionalLight
         position={[4, 8, 3]}
-        intensity={1.3}
+        intensity={1.6}
         color="#dbe8ff"
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-bias={-0.0001}
       />
-      <directionalLight position={[-6, 5, -8]} intensity={0.45} color="#7cc7ff" />
-      <pointLight position={[0, 4.6, 2.2]} intensity={12} distance={16} decay={2} color="#f8fbff" />
-      <pointLight position={[-8.4, 2.2, -0.5]} intensity={7} distance={10} decay={2} color="#8be9fd" />
-      <pointLight position={[8.4, 2.2, -0.5]} intensity={7} distance={10} decay={2} color="#ff5c7a" />
+      <directionalLight position={[-6, 5, -8]} intensity={0.7} color="#8ed2ff" />
+      <pointLight position={[0, 4.6, 2.2]} intensity={15} distance={20} decay={2} color="#f8fbff" />
+      <pointLight position={[-8.4, 2.2, -0.5]} intensity={9} distance={13} decay={2} color="#8be9fd" />
+      <pointLight position={[8.4, 2.2, -0.5]} intensity={9} distance={13} decay={2} color="#ff5c7a" />
+      <pointLight position={[0, 1.8, -1.2]} intensity={6.5} distance={12} decay={2} color="#d9e7ff" />
 
-      {/* Spotlights focalisés sur le centre de chaque cible */}
-      <TargetSpotlight lightPosition={[-3, 5.2, -2.4]} targetPosition={[-3, 1.5, -5]} />
-      <TargetSpotlight lightPosition={[0, 5.2, -2.4]} targetPosition={[0, 1.5, -5]} />
-      <TargetSpotlight lightPosition={[3, 5.2, -2.4]} targetPosition={[3, 1.5, -5]} />
-
-      {/* Faisceaux visibles (cône volumétrique léger) */}
-      <LightBeam lightPosition={[-3, 5.2, -2.4]} targetPosition={[-3, 1.5, -5]} opacity={0.08} color="#ffd8df" />
-      <LightBeam lightPosition={[0, 5.2, -2.4]} targetPosition={[0, 1.5, -5]} opacity={0.08} color="#ffe5ef" />
-      <LightBeam lightPosition={[3, 5.2, -2.4]} targetPosition={[3, 1.5, -5]} opacity={0.08} color="#ffd8df" />
+      {/* Soft target accents integrated into the ceiling lighting */}
+      <TargetAccentLight lightPosition={[-3, 4.9, -3.6]} targetPosition={[-3, 1.5, -5.1]} />
+      <TargetAccentLight lightPosition={[0, 4.9, -3.8]} targetPosition={[0, 1.5, -5.1]} />
+      <TargetAccentLight lightPosition={[3, 4.9, -3.6]} targetPosition={[3, 1.5, -5.1]} />
 
       {/* Néon rouge émanant du centre de chaque cible */}
-      <pointLight position={[-3, 1.5, -4.9]} intensity={5.2} distance={7} decay={2} color="#ff1744" />
-      <pointLight position={[0, 1.5, -4.9]} intensity={5.2} distance={7} decay={2} color="#ff1744" />
-      <pointLight position={[3, 1.5, -4.9]} intensity={5.2} distance={7} decay={2} color="#ff1744" />
+      <pointLight position={[-3, 1.5, -4.9]} intensity={5.6} distance={8} decay={2} color="#ff1744" />
+      <pointLight position={[0, 1.5, -4.9]} intensity={5.6} distance={8} decay={2} color="#ff1744" />
+      <pointLight position={[3, 1.5, -4.9]} intensity={5.6} distance={8} decay={2} color="#ff1744" />
       
       {/* 3 cibles alignées face au joueur (z=-5 est à 10 mètres de z=5) */}
       <Target targetKey="about" position={[-3, 0, -5]} onFallen={onTargetFallen} />

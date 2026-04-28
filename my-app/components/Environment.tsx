@@ -173,6 +173,24 @@ function FloatingDust() {
   )
 }
 
+function AnimatedDisplay({ position, color = "#8be9fd" }: { position: [number, number, number]; color?: string }) {
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  useFrame((state) => {
+    if (!meshRef.current) return
+    const material = meshRef.current.material as THREE.MeshStandardMaterial
+    material.emissiveIntensity = 0.9 + Math.sin(state.clock.elapsedTime * 2.4 + position[0]) * 0.22
+    meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 1.4 + position[2]) * 0.03
+  })
+
+  return (
+    <mesh ref={meshRef} position={position} castShadow={false} receiveShadow>
+      <boxGeometry args={[1.6, 0.9, 0.06]} />
+      <meshStandardMaterial color="#0b1016" emissive={color} emissiveIntensity={0.9} roughness={0.18} metalness={0.3} />
+    </mesh>
+  )
+}
+
 export function Environment() {
   const textures = useMemo(() => {
     const polishedConcrete = makeNoiseTexture({
@@ -378,6 +396,8 @@ export function Environment() {
       {/* Decorative columns */}
       <DisplayColumn x={-7.6} />
       <DisplayColumn x={7.6} />
+      <AnimatedDisplay position={[-6.8, 0.2, 1.5]} color="#8be9fd" />
+      <AnimatedDisplay position={[6.8, 0.2, 1.5]} color="#ff4d6d" />
 
       {/* Front desk-like blocks */}
       <mesh position={[-6.8, -1.28, 0.55]} castShadow receiveShadow>

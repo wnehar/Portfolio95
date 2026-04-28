@@ -15,6 +15,7 @@ interface TargetProps {
 
 export function Target({ position, targetKey, onFallen }: TargetProps) {
   const groupRef = useRef<THREE.Group>(null)
+  const plateGlowRef = useRef<THREE.Mesh>(null)
   const [isHit, setIsHit] = useState(false)
   const [impactPoint, setImpactPoint] = useState<THREE.Vector3 | null>(null)
   const hitTimeRef = useRef<number | null>(null)
@@ -53,6 +54,12 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
     } else {
       groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, 0, 18 * delta)
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 18 * delta)
+    }
+
+    if (plateGlowRef.current) {
+      const pulse = 1.35 + Math.sin(state.clock.elapsedTime * 2.8 + position[0]) * 0.25
+      const material = plateGlowRef.current.material as THREE.MeshStandardMaterial
+      material.emissiveIntensity = isHit ? 2.8 : pulse
     }
   })
 
@@ -96,6 +103,17 @@ export function Target({ position, targetKey, onFallen }: TargetProps) {
           emissiveIntensity={1.6}
           roughness={0.25}
           metalness={0.22}
+        />
+      </mesh>
+      <mesh ref={plateGlowRef} position={[0, 1.4, -0.02]} castShadow={false} receiveShadow={false}>
+        <boxGeometry args={[2.12, 2.52, 0.02]} />
+        <meshStandardMaterial
+          color="#6a101e"
+          emissive="#ff315b"
+          emissiveIntensity={1.35}
+          transparent
+          opacity={0.22}
+          depthWrite={false}
         />
       </mesh>
 

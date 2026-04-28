@@ -92,6 +92,11 @@ function MuzzleFlash({ shotCount }: { shotCount: number }) {
   )
 }
 
+function getWeaponMuzzleOffset(weapon: WeaponKey) {
+  if (weapon === "ak47") return new THREE.Vector3(-0.2, -0.1, -0.78)
+  return new THREE.Vector3(0.24, -0.13, -0.7)
+}
+
 type ShellCasing = {
   position: THREE.Vector3
   velocity: THREE.Vector3
@@ -204,7 +209,7 @@ function WeaponShooter({
   const projectilesRef = useRef<ProjectileTrace[]>([])
   const impactTimeoutsRef = useRef<number[]>([])
   const { play } = useGunSound()
-  const muzzleOffset = useMemo(() => new THREE.Vector3(0.24, -0.13, -0.7), [])
+  const muzzleOffset = useMemo(() => getWeaponMuzzleOffset(weapon), [weapon])
   const startPoint = useMemo(() => new THREE.Vector3(), [])
   const endPoint = useMemo(() => new THREE.Vector3(), [])
   const shotDir = useMemo(() => new THREE.Vector3(), [])
@@ -398,16 +403,12 @@ export function Scene({
   onShot,
   onHit,
   shotCount = 0,
-  sniperScoped = false,
-  onSniperScopeChange,
 }: {
   weapon: WeaponKey
   onTargetFallen?: (targetKey: TargetKey) => void
   onShot?: () => void
   onHit?: () => void
   shotCount?: number
-  sniperScoped?: boolean
-  onSniperScopeChange?: (next: boolean) => void
 }) {
   const recoilDebtRef = useRef(0)
   const recoilReturnSpeedRef = useRef(WEAPONS[weapon].recoilReturnSpeed)
@@ -455,8 +456,8 @@ export function Scene({
       <Target targetKey="skills" position={[0, 0, -5]} onFallen={onTargetFallen} />
       <Target targetKey="contact" position={[3, 0, -5]} onFallen={onTargetFallen} />
 
-      <Player weapon={weapon} sniperScoped={sniperScoped} onSniperScopeChange={onSniperScopeChange} />
-      <WeaponModel weapon={weapon} sniperScoped={sniperScoped} />
+      <Player weapon={weapon} />
+      <WeaponModel weapon={weapon} shotCount={shotCount} />
       <MuzzleFlash shotCount={shotCount} />
       <ShellEjection shotCount={shotCount} />
       <WeaponShooter

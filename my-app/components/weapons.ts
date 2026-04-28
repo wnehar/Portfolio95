@@ -1,6 +1,6 @@
 "use client"
 
-export type WeaponKey = "pistol" | "ak47" | "sniper"
+export type WeaponKey = "pistol" | "ak47"
 
 export type WeaponConfig = {
   label: string
@@ -35,15 +35,6 @@ export const WEAPONS: Record<WeaponKey, WeaponConfig> = {
     recoilKick: 0.09,
     recoilReturnSpeed: 18,
     sound: { type: "ak", gain: 0.18 },
-  },
-  sniper: {
-    label: "Sniper",
-    automatic: false,
-    shotsPerSecond: 1.2,
-    recoilKick: 0.14,
-    recoilReturnSpeed: 10,
-    zoom: { enabled: true, fov: 28, damping: 10 },
-    sound: { type: "sniper", gain: 0.28 },
   },
 }
 

@@ -12,7 +12,6 @@ export default function Home() {
   const [hasStarted, setHasStarted] = useState(false);
   const [openKey, setOpenKey] = useState<TargetKey | null>(null);
   const [weapon, setWeapon] = useState<WeaponKey>("pistol");
-  const [sniperScoped, setSniperScoped] = useState(false);
   const [weaponsOpen, setWeaponsOpen] = useState(false);
   const [shots, setShots] = useState(0);
   const [hits, setHits] = useState(0);
@@ -147,7 +146,7 @@ export default function Home() {
   }, []);
 
   const handleHit = useCallback(() => {
-    const weaponBonus = weapon === "sniper" ? 140 : weapon === "ak47" ? 70 : 95;
+    const weaponBonus = weapon === "ak47" ? 70 : 95;
     setHits((v) => v + 1);
     setStreak((prevStreak) => {
       const nextStreak = prevStreak + 1;
@@ -188,10 +187,6 @@ export default function Home() {
 
   const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
 
-  useEffect(() => {
-    if (weapon !== "sniper") setSniperScoped(false);
-  }, [weapon]);
-
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black">
       {hasStarted ? (
@@ -202,12 +197,10 @@ export default function Home() {
             onShot={handleShot}
             onHit={handleHit}
             shotCount={shots}
-            sniperScoped={sniperScoped}
-            onSniperScopeChange={setSniperScoped}
           />
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <div className={`relative flex items-center justify-center transition ${sniperScoped ? "h-0 w-0 opacity-0" : "h-10 w-10 opacity-100"}`}>
+            <div className="relative flex h-10 w-10 items-center justify-center transition opacity-100">
               <div className="absolute h-10 w-10 rounded-full border border-white/8 bg-white/[0.02] backdrop-blur-[1px]" />
               <div className="absolute h-5 w-5 rounded-full border border-red-400/25" />
               <div className="absolute h-full w-px bg-gradient-to-b from-transparent via-white/90 to-transparent" />
@@ -215,23 +208,6 @@ export default function Home() {
               <div className="absolute h-1.5 w-1.5 rounded-full bg-red-400/90 shadow-[0_0_14px_rgba(248,113,113,0.9)]" />
             </div>
           </div>
-
-          {weapon === "sniper" && sniperScoped && (
-            <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
-              <div className="absolute inset-0 bg-black/78" />
-              <div className="relative h-[72vh] w-[72vh] max-h-[820px] max-w-[820px] overflow-hidden rounded-full border border-black shadow-[0_0_0_9999px_rgba(0,0,0,0.78)]">
-                <div className="absolute inset-0 rounded-full border border-black/70" />
-                <div className="absolute inset-x-1/2 top-0 h-full w-px -translate-x-1/2 bg-black/90" />
-                <div className="absolute inset-y-1/2 left-0 h-px w-full -translate-y-1/2 bg-black/90" />
-                <div className="absolute inset-x-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black/80" />
-                <div className="absolute inset-x-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500" />
-                <div className="absolute left-1/2 top-0 h-10 w-px -translate-x-1/2 bg-red-500/85" />
-                <div className="absolute bottom-0 left-1/2 h-10 w-px -translate-x-1/2 bg-red-500/85" />
-                <div className="absolute left-0 top-1/2 h-px w-10 -translate-y-1/2 bg-red-500/85" />
-                <div className="absolute right-0 top-1/2 h-px w-10 -translate-y-1/2 bg-red-500/85" />
-              </div>
-            </div>
-          )}
 
           {hitFlash && (
             <div className="pointer-events-none absolute inset-0 z-30 bg-white/5">
@@ -341,7 +317,7 @@ export default function Home() {
             <div className="relative">
               {weaponsOpen && (
                 <div className="absolute bottom-14 right-0 w-48 overflow-hidden rounded-2xl border border-white/10 bg-neutral-950/90 shadow-2xl backdrop-blur-xl">
-                  {(["pistol", "ak47", "sniper"] as WeaponKey[]).map((k) => (
+                  {(["pistol", "ak47"] as WeaponKey[]).map((k) => (
                     <button
                       key={k}
                       type="button"
@@ -370,21 +346,6 @@ export default function Home() {
             </div>
           </div>
 
-          {weapon === "sniper" && (
-            <div className="pointer-events-auto fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
-              <button
-                type="button"
-                onClick={() => setSniperScoped((v) => !v)}
-                className={`rounded-full border px-6 py-3 text-xs font-semibold tracking-[0.28em] shadow-lg backdrop-blur-xl transition focus:outline-none focus:ring-2 focus:ring-white/25 ${
-                  sniperScoped
-                    ? "border-red-400/35 bg-red-500/20 text-white"
-                    : "border-white/15 bg-neutral-950/75 text-white/90 hover:bg-neutral-900/75"
-                }`}
-              >
-                {sniperScoped ? "QUITTER LE VISEUR" : "VISEUR"}
-              </button>
-            </div>
-          )}
         </>
       ) : (
         <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,82,119,0.18),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(107,187,255,0.14),transparent_26%),linear-gradient(180deg,#06080b_0%,#0c1016_45%,#040507_100%)] px-6 text-white">

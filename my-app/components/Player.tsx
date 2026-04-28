@@ -48,12 +48,8 @@ export const usePlayerControls = () => {
 
 export function Player({
   weapon,
-  sniperScoped = false,
-  onSniperScopeChange,
 }: {
   weapon: WeaponKey
-  sniperScoped?: boolean
-  onSniperScopeChange?: (next: boolean) => void
 }) {
   const { forward, backward, left, right } = usePlayerControls()
   const { camera, gl } = useThree()
@@ -107,34 +103,18 @@ export function Player({
       if (isLockedRef.current) e.preventDefault()
     }
 
-    const onMouseDown = (e: MouseEvent) => {
-      if (e.button !== 2) return
-      if (!isLockedRef.current) return
-      if (weapon !== "sniper") return
-      onSniperScopeChange?.(true)
-    }
-
-    const onMouseUp = (e: MouseEvent) => {
-      if (e.button !== 2) return
-      onSniperScopeChange?.(false)
-    }
-
     dom.addEventListener("pointerdown", onPointerDown)
     document.addEventListener("pointerlockchange", onPointerLockChange)
     document.addEventListener("mousemove", onMouseMove)
     document.addEventListener("contextmenu", onContextMenu, true)
-    document.addEventListener("mousedown", onMouseDown)
-    document.addEventListener("mouseup", onMouseUp)
 
     return () => {
       dom.removeEventListener("pointerdown", onPointerDown)
       document.removeEventListener("pointerlockchange", onPointerLockChange)
       document.removeEventListener("mousemove", onMouseMove)
       document.removeEventListener("contextmenu", onContextMenu, true)
-      document.removeEventListener("mousedown", onMouseDown)
-      document.removeEventListener("mouseup", onMouseUp)
     }
-  }, [onSniperScopeChange, weapon])
+  }, [])
 
   useFrame((state, delta) => {
     if (!isLockedRef.current) return
@@ -151,12 +131,9 @@ export function Player({
     cam.rotation.y = yawRef.current
     cam.rotation.x = pitchRef.current
 
-    // Zoom (sniper RMB)
     const baseFov = 75
-    const zoomCfg = WEAPONS[weapon].zoom
-    const desired = zoomCfg?.enabled && sniperScoped ? zoomCfg.fov : baseFov
-    const zoomDamping = zoomCfg?.enabled ? zoomCfg.damping : 12
-    fovTargetRef.current = desired
+    const zoomDamping = 12
+    fovTargetRef.current = baseFov
 
     if ("fov" in cam) {
       const current = (cam as THREE.PerspectiveCamera).fov

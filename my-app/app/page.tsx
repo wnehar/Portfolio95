@@ -93,22 +93,202 @@ export default function Home() {
         ),
       },
       skills: {
-        title: "Compétences",
+        title: "Projets & compétences",
         body: (
-          <>
-            <p>
-              Front-end: React / Next.js, TypeScript, UI responsive,
-              accessibilité.
-            </p>
-            <p>
-              3D & interaction: Three.js, React Three Fiber, intégration
-              d’expériences temps réel.
-            </p>
-            <p>
-              Bonnes pratiques: design system léger, code maintenable,
-              optimisation des assets.
-            </p>
-          </>
+          <div className="space-y-6">
+            <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+              <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Portfolio</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">Mes projets</h3>
+              <p className="mt-2 max-w-2xl text-white/65">
+                Une selection de projets realises autour du web, de la conception produit,
+                de la presentation d’idees et de l’utilisation d’outils IA pour produire
+                des experiences plus modernes et plus impactantes.
+              </p>
+            </div>
+
+            <div className="grid gap-4">
+              <a
+                href="https://www.linkedin.com/posts/william-nehar-73a528382_eugeniaschool-lvmh-ia-activity-7430170793302470656-SGko?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF5n-B4B8iEgE_yF9gnnSncWzax3ec_wkuo"
+                target="_blank"
+                rel="noreferrer"
+                className="group overflow-hidden rounded-[24px] border border-white/10 bg-black/20 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+              >
+                <div className="grid gap-0 md:grid-cols-[260px_minmax(0,1fr)]">
+                  <div className="relative h-52 overflow-hidden md:h-full">
+                    <Image
+                      src="/projects/lvmh-project.png"
+                      alt="Projet LVMH"
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-red-200/85">
+                        LinkedIn
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/55">
+                        Strategie / IA / Presentation
+                      </span>
+                    </div>
+                    <h4 className="mt-4 text-xl font-semibold text-white">Projet LVMH</h4>
+                    <p className="mt-3 text-white/72">
+                      Realisation d’un BDD pour LVMH autour d’une problematique concrete,
+                      avec une reponse pensee pour un vrai besoin metier. Ce projet m’a
+                      permis de travailler la reflexion strategique, la presentation orale
+                      et l’utilisation de l’IA comme levier d’innovation.
+                    </p>
+                    <p className="mt-4 text-sm text-white/55">
+                      Cliquer pour voir la publication LinkedIn.
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <a
+                href="https://wiloc-e7d716.webflow.io"
+                target="_blank"
+                rel="noreferrer"
+                className="group overflow-hidden rounded-[24px] border border-white/10 bg-black/20 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+              >
+                <div className="grid gap-0 md:grid-cols-[260px_minmax(0,1fr)]">
+                  <div className="relative h-52 overflow-hidden md:h-full">
+                    <Image
+                      src="/projects/wiloc-project.png"
+                      alt="Projet de location de voiture Wiloc"
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-red-200/85">
+                        Site web
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/55">
+                        UX / Web design / Parcours client
+                      </span>
+                    </div>
+                    <h4 className="mt-4 text-xl font-semibold text-white">Site de location de voiture</h4>
+                    <p className="mt-3 text-white/72">
+                      Conception d’un site moderne de location automobile avec une approche
+                      claire, premium et rassurante. L’objectif etait de rendre la reservation
+                      simple, visuelle et fluide, avec une presentation soignee du service,
+                      du parcours client et des vehicules disponibles.
+                    </p>
+                    <p className="mt-4 text-sm text-white/55">
+                      Cliquer pour visiter le site.
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <a
+                href="https://www.linkedin.com/posts/william-nehar-73a528382_projet-bdd-cursor-project-eugenia-school-activity-7414983793587044354-spER?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF5n-B4B8iEgE_yF9gnnSncWzax3ec_wkuo"
+                target="_blank"
+                rel="noreferrer"
+                className="group overflow-hidden rounded-[24px] border border-white/10 bg-black/20 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+              >
+                <div className="grid gap-0 md:grid-cols-[260px_minmax(0,1fr)]">
+                  <div className="relative h-52 overflow-hidden md:h-full">
+                    <Image
+                      src="/projects/cursor-project.png"
+                      alt="Projet BDD Cursor Project Eugenia School"
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-red-200/85">
+                        LinkedIn
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/55">
+                        Base de donnees / Plateforme / IA
+                      </span>
+                    </div>
+                    <h4 className="mt-4 text-xl font-semibold text-white">
+                      Cursor Project - Eugenia School
+                    </h4>
+                    <p className="mt-3 text-white/72">
+                      Creation d’un site inspire des codes d’un reseau social pour Eugenia
+                      School, avec gestion des roles utilisateurs, publication de contenu,
+                      interactions sociales et espace de messagerie. Ce projet m’a permis de
+                      renforcer mes bases en developpement web, structure de donnees et logique
+                      produit.
+                    </p>
+                    <p className="mt-4 text-sm text-white/55">
+                      Cliquer pour voir la publication LinkedIn.
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Competences</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {[
+                    "IA Prompting",
+                    "React",
+                    "Next.js",
+                    "TypeScript",
+                    "JavaScript",
+                    "Three.js",
+                    "React Three Fiber",
+                    "HTML / CSS",
+                    "Tailwind CSS",
+                    "UI Design",
+                    "UX Thinking",
+                    "Web Design",
+                    "Conception de projet",
+                    "Presentation orale",
+                    "Storytelling produit",
+                    "Travail en equipe",
+                    "Organisation",
+                    "Veille technologique",
+                  ].map((skill) => (
+                    <span
+                      key={skill}
+                      className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-xs text-white/78"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-4 text-white/62">
+                  J’aime concevoir des projets modernes, visuels et utiles, en melangeant
+                  logique technique, sens du design et bonne utilisation des outils IA.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Langues</p>
+                  <div className="mt-4 space-y-3">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Francais</p>
+                      <p className="mt-1 text-base font-medium text-white">Courant</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Anglais</p>
+                      <p className="mt-1 text-base font-medium text-white">Intermediaire professionnel</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Profil</p>
+                  <p className="mt-3 text-white/68">
+                    Profil creatif et ambitieux, a l’aise pour imaginer un concept, le
+                    transformer en site concret et le presenter avec impact. Je m’interesse
+                    particulierement aux experiences digitales modernes, au design et a l’IA.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         ),
       },
       contact: {
@@ -186,6 +366,13 @@ export default function Home() {
   }, [completedTargets]);
 
   const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
+
+  useEffect(() => {
+    if (!openKey && !showSessionSummary) return;
+    if (document.pointerLockElement) {
+      document.exitPointerLock();
+    }
+  }, [openKey, showSessionSummary]);
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black">

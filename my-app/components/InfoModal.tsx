@@ -34,7 +34,7 @@ export function InfoModal({
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-[28px] border border-white/15 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_38%),linear-gradient(180deg,rgba(23,23,23,0.98),rgba(8,8,8,0.96))] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-[28px] border border-white/15 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_38%),linear-gradient(180deg,rgba(23,23,23,0.98),rgba(8,8,8,0.96))] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         <div className="pointer-events-none absolute -left-16 top-10 h-32 w-32 rounded-full bg-red-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-12 bottom-16 h-36 w-36 rounded-full bg-white/10 blur-3xl" />
@@ -53,7 +53,9 @@ export function InfoModal({
           </button>
         </div>
 
-        <div className="relative mt-6 text-sm leading-relaxed text-white/85">{children}</div>
+        <div className="relative mt-6 max-h-[68vh] overflow-y-auto pr-2 text-sm leading-relaxed text-white/85 [scrollbar-color:rgba(248,113,113,0.55)_transparent] [scrollbar-width:thin]">
+          {children}
+        </div>
 
         <div className="relative mt-8 flex justify-center border-t border-white/10 pt-5">
           <button

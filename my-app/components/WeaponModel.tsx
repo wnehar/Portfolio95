@@ -6,11 +6,7 @@ import { useGLTF } from "@react-three/drei"
 import * as THREE from "three"
 import type { WeaponKey } from "./weapons"
 
-const WEAPON_MODEL_URLS: Record<WeaponKey, string> = {
-  pistol: "https://raw.githubusercontent.com/webaverse/pistol/master/glock.glb",
-  ak47: "https://raw.githubusercontent.com/SAAAM-LLC/3D_model_bundle/main/weapons/SAM_ASSET-LARGE-MACHINE-GUN.glb",
-  sniper: "https://raw.githubusercontent.com/SAAAM-LLC/3D_model_bundle/main/weapons/SAM_ASSET-RIFLE1.glb",
-}
+const PISTOL_MODEL_URL = "https://raw.githubusercontent.com/webaverse/pistol/master/glock.glb"
 
 const WEAPON_TRANSFORMS: Record<
   WeaponKey,
@@ -27,16 +23,118 @@ const WEAPON_TRANSFORMS: Record<
     scale: 0.22,
   },
   ak47: {
-    offset: new THREE.Vector3(0.34, -0.34, -0.82),
-    rotation: new THREE.Euler(0.04, Math.PI - 0.22, 0.08),
-    scale: 0.135,
+    offset: new THREE.Vector3(0.28, -0.26, -0.8),
+    rotation: new THREE.Euler(-0.03, Math.PI - 0.08, 0.02),
+    scale: 1,
   },
   sniper: {
-    offset: new THREE.Vector3(0.36, -0.28, -1.02),
-    rotation: new THREE.Euler(-0.01, Math.PI - 0.09, 0.015),
-    scale: 0.115,
-    adsOffset: new THREE.Vector3(0.005, -0.01, -0.22),
+    offset: new THREE.Vector3(0.22, -0.2, -1.02),
+    rotation: new THREE.Euler(-0.015, Math.PI - 0.02, 0.01),
+    scale: 1,
+    adsOffset: new THREE.Vector3(0.01, -0.015, -0.56),
   },
+}
+
+function metalMaterial(color: string) {
+  return new THREE.MeshStandardMaterial({ color, roughness: 0.34, metalness: 0.88 })
+}
+
+function polymerMaterial(color: string) {
+  return new THREE.MeshStandardMaterial({ color, roughness: 0.62, metalness: 0.18 })
+}
+
+function woodMaterial(color: string) {
+  return new THREE.MeshStandardMaterial({ color, roughness: 0.72, metalness: 0.05 })
+}
+
+function ProceduralAk47() {
+  return (
+    <group>
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.65, 0.12, 0.12]} />
+        <primitive object={metalMaterial("#2a2f36")} attach="material" />
+      </mesh>
+      <mesh position={[0.28, 0.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.76, 0.16, 0.16]} />
+        <primitive object={metalMaterial("#343a44")} attach="material" />
+      </mesh>
+      <mesh position={[-0.52, 0.02, 0]} rotation={[0, 0, -0.92]} castShadow receiveShadow>
+        <boxGeometry args={[0.72, 0.16, 0.18]} />
+        <primitive object={polymerMaterial("#171b20")} attach="material" />
+      </mesh>
+      <mesh position={[-0.78, 0.03, 0]} rotation={[0, 0, 0.65]} castShadow receiveShadow>
+        <boxGeometry args={[0.54, 0.14, 0.18]} />
+        <primitive object={woodMaterial("#6f4228")} attach="material" />
+      </mesh>
+      <mesh position={[0.7, -0.08, 0]} rotation={[0, 0, -0.22]} castShadow receiveShadow>
+        <boxGeometry args={[0.56, 0.26, 0.15]} />
+        <primitive object={woodMaterial("#8b5a34")} attach="material" />
+      </mesh>
+      <mesh position={[0.12, -0.22, 0]} rotation={[0, 0, 0.25]} castShadow receiveShadow>
+        <boxGeometry args={[0.28, 0.5, 0.12]} />
+        <primitive object={metalMaterial("#272c34")} attach="material" />
+      </mesh>
+      <mesh position={[0.42, -0.34, 0]} rotation={[0, 0, 0.28]} castShadow receiveShadow>
+        <torusGeometry args={[0.22, 0.07, 10, 22, Math.PI]} />
+        <primitive object={metalMaterial("#2d323a")} attach="material" />
+      </mesh>
+      <mesh position={[0.94, 0.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.4, 0.2, 0.18]} />
+        <primitive object={metalMaterial("#22272f")} attach="material" />
+      </mesh>
+      <mesh position={[1.2, 0.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.38, 0.18, 0.14]} />
+        <primitive object={woodMaterial("#7d4a28")} attach="material" />
+      </mesh>
+      <mesh position={[-0.18, 0.22, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.18, 0.08, 0.08]} />
+        <primitive object={metalMaterial("#14181d")} attach="material" />
+      </mesh>
+    </group>
+  )
+}
+
+function ProceduralSniper() {
+  return (
+    <group>
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.25, 0.09, 0.09]} />
+        <primitive object={metalMaterial("#272d35")} attach="material" />
+      </mesh>
+      <mesh position={[0.2, -0.12, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.7, 0.16, 0.16]} />
+        <primitive object={polymerMaterial("#1a1e24")} attach="material" />
+      </mesh>
+      <mesh position={[-0.72, -0.18, 0]} rotation={[0, 0, -0.58]} castShadow receiveShadow>
+        <boxGeometry args={[0.82, 0.14, 0.18]} />
+        <primitive object={polymerMaterial("#12161b")} attach="material" />
+      </mesh>
+      <mesh position={[-0.12, -0.28, 0]} rotation={[0, 0, -0.15]} castShadow receiveShadow>
+        <boxGeometry args={[0.28, 0.44, 0.11]} />
+        <primitive object={polymerMaterial("#12161b")} attach="material" />
+      </mesh>
+      <mesh position={[0.1, 0.16, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.065, 0.065, 0.84, 18]} />
+        <primitive object={metalMaterial("#10141a")} attach="material" />
+      </mesh>
+      <mesh position={[-0.18, 0.16, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.048, 0.048, 0.22, 16]} />
+        <primitive object={metalMaterial("#0f1318")} attach="material" />
+      </mesh>
+      <mesh position={[0.38, 0.16, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.048, 0.048, 0.22, 16]} />
+        <primitive object={metalMaterial("#0f1318")} attach="material" />
+      </mesh>
+      <mesh position={[0.92, -0.06, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.5, 0.1, 0.14]} />
+        <primitive object={polymerMaterial("#20252d")} attach="material" />
+      </mesh>
+      <mesh position={[1.18, -0.02, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.04, 0.06, 0.22, 16]} />
+        <primitive object={metalMaterial("#7d828a")} attach="material" />
+      </mesh>
+    </group>
+  )
 }
 
 export function WeaponModel({
@@ -51,14 +149,14 @@ export function WeaponModel({
   const { camera } = useThree()
   const aimingRef = useRef(false)
   const aimBlendRef = useRef(0)
-  const { scene } = useGLTF(WEAPON_MODEL_URLS[weapon])
+  const pistolModelData = useGLTF(PISTOL_MODEL_URL)
   const transform = WEAPON_TRANSFORMS[weapon]
   const offset = transform.offset
 
   const tmp = useMemo(() => new THREE.Vector3(), [])
   const swayRef = useRef(new THREE.Vector3())
-  const model = useMemo(() => {
-    const cloned = scene.clone(true)
+  const pistolModel = useMemo(() => {
+    const cloned = pistolModelData.scene.clone(true)
     cloned.traverse((obj) => {
       const mesh = obj as THREE.Mesh
       if (!mesh.isMesh) return
@@ -80,7 +178,7 @@ export function WeaponModel({
       }
     })
     return cloned
-  }, [scene])
+  }, [pistolModelData.scene])
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
@@ -146,13 +244,13 @@ export function WeaponModel({
   return (
     <group ref={groupRef}>
       <group ref={modelRef}>
-        <primitive object={model} />
+        {weapon === "pistol" ? <primitive object={pistolModel} /> : null}
+        {weapon === "ak47" ? <ProceduralAk47 /> : null}
+        {weapon === "sniper" ? <ProceduralSniper /> : null}
       </group>
     </group>
   )
 }
 
-useGLTF.preload(WEAPON_MODEL_URLS.pistol)
-useGLTF.preload(WEAPON_MODEL_URLS.ak47)
-useGLTF.preload(WEAPON_MODEL_URLS.sniper)
+useGLTF.preload(PISTOL_MODEL_URL)
 

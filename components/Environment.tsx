@@ -166,7 +166,7 @@ function FloatingDust() {
   return (
     <points ref={pointsRef} position={[0, 0.8, -3]}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial color="#d9e4ff" size={0.045} transparent opacity={0.16} sizeAttenuation depthWrite={false} />
     </points>

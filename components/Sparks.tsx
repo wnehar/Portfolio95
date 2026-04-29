@@ -42,7 +42,7 @@ export function Sparks({ position }: { position: THREE.Vector3 }) {
     if (flashRef.current) {
       const flashScale = Math.max(0, 1 - elapsed * 3.8)
       flashRef.current.scale.setScalar(0.45 * flashScale)
-      flashRef.current.material.opacity = flashScale * 0.65
+      ;(flashRef.current.material as THREE.Material).opacity = flashScale * 0.65
     }
     
     sparksRef.current.forEach((spark, i) => {

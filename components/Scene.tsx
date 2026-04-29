@@ -167,10 +167,10 @@ function ShellEjection({ shotCount }: { shotCount: number }) {
       mesh.rotation.copy(casing.rotation)
     })
 
-    i < (groupRef.current?.children.length || 0);
-    const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
-    mesh?.visible = false
-  }
+    for (let i = casingsRef.current.length; i < groupRef.current.children.length; i++) {
+      const mesh = groupRef.current.children[i] as THREE.Mesh
+      mesh.visible = false
+    }
   })
 
 return (

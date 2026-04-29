@@ -17,6 +17,99 @@ type Project = {
   tech: string[];
 };
 
+function TechIcon({ name }: { name: string }) {
+  const n = name.toLowerCase();
+  
+  if (n.includes("react")) {
+    return (
+      <svg viewBox="-11.5 -10.23174 23 20.46348" className="h-3.5 w-3.5 shrink-0 text-[#61DAFB]">
+        <circle cx="0" cy="0" r="2.05" fill="#61dafb"/>
+        <g stroke="#61dafb" strokeWidth="1" fill="none">
+          <ellipse rx="11" ry="4.2"/>
+          <ellipse rx="11" ry="4.2" transform="rotate(60)"/>
+          <ellipse rx="11" ry="4.2" transform="rotate(120)"/>
+        </g>
+      </svg>
+    );
+  }
+  if (n.includes("figma")) {
+    return (
+      <svg viewBox="0 0 38 57" className="h-3 w-3 shrink-0">
+        <path fill="#F24E1E" d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z"/>
+        <path fill="#FF7262" d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v19H9.5A9.5 9.5 0 0 1 0 47.5z"/>
+        <path fill="#1ABCFE" d="M19 0v19h9.5a9.5 9.5 0 1 0 0-19H19z"/>
+        <path fill="#0ACF83" d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z"/>
+        <path fill="#A259FF" d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z"/>
+      </svg>
+    );
+  }
+  if (n.includes("webflow")) {
+    return (
+      <svg viewBox="0 0 500 500" className="h-3 w-3 shrink-0 fill-current text-[#146EF5]">
+        <path d="M386.4,121.2c-29.3,0-52.6,22-54.8,49.8c-2.3-27.8-25.5-49.8-54.8-49.8c-23,0-42.5,13.2-50.8,32.4 c-8.3-19.1-27.8-32.4-50.8-32.4c-30.7,0-55.6,25.3-55.6,56.5v191h45.2v-176c0-11,8.6-20.1,19.3-20.1c10.7,0,19.3,9,19.3,20.1v176h45.2 v-176c0-11,8.6-20.1,19.3-20.1c10.7,0,19.3,9,19.3,20.1v176h45.2v-176c0-11,8.6-20.1,19.3-20.1c10.7,0,19.3,9,19.3,20.1v176h45.2 v-206.5C442,146.5,417.1,121.2,386.4,121.2z"/>
+      </svg>
+    );
+  }
+  if (n.includes("base") || n.includes("data") || n.includes("architecture")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-blue-400">
+        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+      </svg>
+    );
+  }
+  if (n.includes("ia") || n.includes("intelligence")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-yellow-400">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+      </svg>
+    );
+  }
+  if (n.includes("stratégie") || n.includes("produit") || n.includes("logique")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-red-400">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="6"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+      </svg>
+    );
+  }
+  if (n.includes("ux") || n.includes("ui") || n.includes("parcours") || n.includes("design")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-pink-400">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="3" y1="9" x2="21" y2="9"></line>
+        <line x1="9" y1="21" x2="9" y2="9"></line>
+      </svg>
+    );
+  }
+  if (n.includes("autonomie") || n.includes("seul")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-emerald-400">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    );
+  }
+  if (n.includes("storytelling") || n.includes("pitch") || n.includes("présentation") || n.includes("keynote")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-purple-400">
+        <path d="M2 3h20"></path>
+        <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"></path>
+        <path d="m7 21 5-5 5 5"></path>
+      </svg>
+    );
+  }
+  
+  // Fallback icon (small diamond)
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-2 w-2 shrink-0 text-white/50">
+      <path d="M12 2L2 12l10 10 10-10L12 2z" />
+    </svg>
+  );
+}
+
 const PROJECTS: Project[] = [
   {
     id: "lvmh",
@@ -132,12 +225,13 @@ export function SkillsAndProjects() {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
               <h3 className="text-3xl font-bold text-white">{selectedProject.title}</h3>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {selectedProject.tech.map((t) => (
                   <span
                     key={t}
-                    className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.1em] text-white/80 backdrop-blur-md"
+                    className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-white/90 backdrop-blur-md shadow-lg"
                   >
+                    <TechIcon name={t} />
                     {t}
                   </span>
                 ))}
@@ -227,12 +321,13 @@ export function SkillsAndProjects() {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 transition duration-300 group-hover:opacity-40" />
-                <div className="absolute bottom-4 left-4 flex gap-2">
-                  {project.tags.slice(0, 2).map((tag) => (
+                <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 pr-4">
+                  {project.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full bg-black/60 px-2.5 py-1 text-[10px] uppercase tracking-wider text-white backdrop-blur-md"
+                      className="flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur-md border border-white/5 shadow-sm"
                     >
+                      <TechIcon name={tag} />
                       {tag}
                     </span>
                   ))}

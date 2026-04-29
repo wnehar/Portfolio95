@@ -160,7 +160,7 @@ function ShellEjection({ shotCount }: { shotCount: number }) {
         casing.velocity.z *= 0.92
       }
 
-      const mesh = groupRef.current.children[i] as THREE.Mesh | undefined
+      const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
       if (!mesh) return
       mesh.visible = true
       mesh.position.copy(casing.position)
@@ -168,7 +168,7 @@ function ShellEjection({ shotCount }: { shotCount: number }) {
     })
 
     for (let i = casingsRef.current.length; i < groupRef.current.children.length; i++) {
-      const mesh = groupRef.current.children[i] as THREE.Mesh
+      const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
       mesh.visible = false
     }
   })

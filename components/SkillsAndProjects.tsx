@@ -11,8 +11,9 @@ type Project = {
   image: string;
   link: string;
   linkText: string;
-  context: string;
-  role: string;
+  challenge: string;
+  solution: string;
+  result: string;
   tech: string[];
 };
 
@@ -22,28 +23,34 @@ const PROJECTS: Project[] = [
     title: "Projet Stratégique LVMH",
     tags: ["Stratégie", "IA", "Présentation"],
     shortDesc:
-      "Réalisation d'un BDD pour LVMH autour d'une problématique concrète, avec une réponse pensée pour un vrai besoin métier.",
+      "Réalisation d'un Business Development Document (BDD) pour LVMH intégrant l'Intelligence Artificielle au cœur de la stratégie.",
     image: "/projects/lvmh-project.png",
     link: "https://www.linkedin.com/posts/william-nehar-73a528382_eugeniaschool-lvmh-ia-activity-7430170793302470656-SGko",
     linkText: "Voir la publication LinkedIn",
-    context:
-      "LVMH cherchait des idées novatrices pour moderniser ses processus tout en conservant son image de marque premium. Le défi était de proposer une solution qui allie intelligence artificielle et luxe.",
-    role: "J'ai mené la réflexion stratégique, structuré la présentation finale et démontré comment l'IA pouvait servir de levier d'innovation concret pour le groupe.",
-    tech: ["IA Prompting", "Stratégie Produit", "Storytelling", "Keynote"],
+    challenge:
+      "LVMH a pour exigence constante l'excellence et l'innovation. Le défi était d'imaginer et de présenter une solution technologique viable qui respecte l'ADN ultra-premium du groupe tout en répondant à un véritable besoin métier complexe.",
+    solution:
+      "J'ai mené une réflexion stratégique approfondie pour proposer une intégration sur-mesure de l'Intelligence Artificielle. Le travail incluait l'analyse du besoin, la structuration d'un Business Development Document complet, et la préparation d'un pitch impactant pour défendre mes idées.",
+    result:
+      "Une présentation saluée pour sa clarté et sa faisabilité. Ce projet m'a permis d'affûter ma capacité à lier des concepts techniques (IA) à des enjeux business concrets de très haut niveau.",
+    tech: ["Stratégie Produit", "IA Prompting", "Storytelling", "Keynote / Pitch"],
   },
   {
     id: "wiloc",
     title: "Site de location automobile - Wiloc",
     tags: ["UX", "Web design", "Parcours client"],
     shortDesc:
-      "Conception d'un site moderne de location automobile avec une approche claire, premium et rassurante.",
+      "Conception et développement intégral d'un site de location automobile premium, réalisé de A à Z en solo.",
     image: "/projects/wiloc-project.png",
     link: "https://wiloc-e7d716.webflow.io",
     linkText: "Visiter le site web",
-    context:
-      "Le secteur de la location de voitures souffre souvent d'interfaces complexes. L'objectif était de rendre la réservation visuelle, fluide et premium.",
-    role: "J'ai conçu l'intégralité de l'interface utilisateur, repensé le parcours de réservation de A à Z et intégré le design sur Webflow.",
-    tech: ["Webflow", "UI/UX Design", "Figma", "Parcours Client"],
+    challenge:
+      "Le secteur de la location automobile souffre souvent de sites surchargés et confus. L'objectif était de créer une expérience utilisateur (UX) fluide, rassurante et esthétiquement irréprochable pour la réservation de véhicules de prestige.",
+    solution:
+      "J'ai réalisé l'intégralité de ce projet absolument seul et sans aucune aide de l'Intelligence Artificielle. J'ai pensé l'arborescence, maquetté chaque écran pour maximiser la conversion, et développé le site complet sur Webflow avec des animations sur-mesure pour sublimer les véhicules.",
+    result:
+      "Un produit fini professionnel, rapide et visuellement percutant. Ce projet démontre ma pleine autonomie sur la création de plateformes web complexes, de la page blanche jusqu'à la mise en ligne.",
+    tech: ["Webflow", "UI/UX Design", "Figma", "Parcours Client", "Autonomie Totale"],
   },
   {
     id: "cursor",
@@ -54,10 +61,13 @@ const PROJECTS: Project[] = [
     image: "/projects/cursor-project.png",
     link: "https://www.linkedin.com/posts/william-nehar-73a528382_projet-bdd-cursor-project-eugenia-school-activity-7414983793587044354-spER",
     linkText: "Voir le projet sur LinkedIn",
-    context:
-      "L'école avait besoin d'un espace interactif pour favoriser les échanges entre étudiants, avec gestion des rôles, publications et messagerie.",
-    role: "J'ai structuré la base de données, développé les fonctionnalités sociales et intégré l'intelligence artificielle pour l'assistance au code et à la modération.",
-    tech: ["React", "Bases de données", "IA", "Logique Produit"],
+    challenge:
+      "L'école avait besoin d'un espace interactif interne pour favoriser les échanges entre étudiants, avec une véritable architecture logicielle : gestion des rôles, publications dynamiques, et un système de messagerie fluide.",
+    solution:
+      "J'ai structuré une base de données robuste capable d'encaisser les interactions sociales en temps réel. J'ai ensuite développé les fonctionnalités front-end et back-end, tout en y intégrant l'IA pour automatiser la modération et l'assistance utilisateur.",
+    result:
+      "Une plateforme fonctionnelle qui prouve ma capacité à manipuler de la data complexe, à gérer des états utilisateurs multiples, et à créer une expérience sociale engageante.",
+    tech: ["Bases de données", "Logique Produit", "Architecture", "Intégration IA"],
   },
 ];
 
@@ -136,14 +146,24 @@ export function SkillsAndProjects() {
           </div>
 
           <div className="p-8">
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-8 md:grid-cols-3">
               <div>
-                <h4 className="text-[11px] uppercase tracking-[0.25em] text-red-300/80">Le Contexte</h4>
-                <p className="mt-2 text-sm leading-relaxed text-white/75">{selectedProject.context}</p>
+                <h4 className="flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-red-300/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span> Le Défi
+                </h4>
+                <p className="mt-3 text-sm leading-relaxed text-white/75">{selectedProject.challenge}</p>
               </div>
               <div>
-                <h4 className="text-[11px] uppercase tracking-[0.25em] text-red-300/80">Mon Rôle</h4>
-                <p className="mt-2 text-sm leading-relaxed text-white/75">{selectedProject.role}</p>
+                <h4 className="flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-red-300/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span> L'Approche
+                </h4>
+                <p className="mt-3 text-sm leading-relaxed text-white/75">{selectedProject.solution}</p>
+              </div>
+              <div>
+                <h4 className="flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-red-300/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span> Le Résultat
+                </h4>
+                <p className="mt-3 text-sm leading-relaxed text-white/75">{selectedProject.result}</p>
               </div>
             </div>
 

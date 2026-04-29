@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Scene } from "@/components/Scene";
+import dynamic from "next/dynamic";
+const Scene = dynamic(() => import("@/components/Scene").then(mod => mod.Scene), { ssr: false });
 import { InfoModal } from "@/components/InfoModal";
 import type { TargetKey } from "@/components/Target";
 import { WEAPONS, type WeaponKey } from "@/components/weapons";

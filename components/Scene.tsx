@@ -60,7 +60,7 @@ function MuzzleFlash({ shotCount }: { shotCount: number }) {
     flashRef.current.quaternion.copy(camera.quaternion)
     lightRef.current.position.copy(flashRef.current.position)
 
-    const active = performance.now() < flashUntilRef.current && document.pointerLockElement
+    const active = performance.now() < flashUntilRef.current && !!document.pointerLockElement
     flashRef.current.visible = active
     lightRef.current.visible = active
 
@@ -424,7 +424,7 @@ export function Scene({
       <hemisphereLight intensity={0.6} color="#e1ecff" groundColor="#1b1d22" />
 
       <fog attach="fog" args={["#10141a", 11, 42]} />
-      
+
       <Environment />
 
       <directionalLight
@@ -450,7 +450,7 @@ export function Scene({
       <pointLight position={[-3, 1.5, -4.9]} intensity={5.6} distance={8} decay={2} color="#ff1744" />
       <pointLight position={[0, 1.5, -4.9]} intensity={5.6} distance={8} decay={2} color="#ff1744" />
       <pointLight position={[3, 1.5, -4.9]} intensity={5.6} distance={8} decay={2} color="#ff1744" />
-      
+
       {/* 3 cibles alignées face au joueur (z=-5 est à 10 mètres de z=5) */}
       <Target targetKey="about" position={[-3, 0, -5]} onFallen={onTargetFallen} />
       <Target targetKey="skills" position={[0, 0, -5]} onFallen={onTargetFallen} />

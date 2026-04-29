@@ -167,22 +167,22 @@ function ShellEjection({ shotCount }: { shotCount: number }) {
       mesh.rotation.copy(casing.rotation)
     })
 
-    for (let i = casingsRef.current.length; i < groupRef.current.children.length; i++) {
-      const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
-      mesh.visible = false
-    }
+    i < (groupRef.current?.children.length || 0);
+    const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
+    mesh?.visible = false
+  }
   })
 
-  return (
-    <group ref={groupRef}>
-      {Array.from({ length: 12 }).map((_, i) => (
-        <mesh key={i} visible={false} castShadow receiveShadow>
-          <cylinderGeometry args={[0.022, 0.022, 0.09, 10]} />
-          <meshStandardMaterial color="#b38a3a" roughness={0.28} metalness={0.92} />
-        </mesh>
-      ))}
-    </group>
-  )
+return (
+  <group ref={groupRef}>
+    {Array.from({ length: 12 }).map((_, i) => (
+      <mesh key={i} visible={false} castShadow receiveShadow>
+        <cylinderGeometry args={[0.022, 0.022, 0.09, 10]} />
+        <meshStandardMaterial color="#b38a3a" roughness={0.28} metalness={0.92} />
+      </mesh>
+    ))}
+  </group>
+)
 }
 
 function WeaponShooter({

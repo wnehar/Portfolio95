@@ -310,15 +310,86 @@ export default function Home() {
       contact: {
         title: "Contact",
         body: (
-          <>
-            <p>
-              Envie de collaborer, proposer une mission ou simplement discuter?
-            </p>
-            <p>
-              Écris-moi avec un bref contexte (projet, deadline, budget) et je
-              te réponds rapidement.
-            </p>
-          </>
+          <div className="space-y-6">
+            <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+              <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Contact</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">Me joindre rapidement</h3>
+              <p className="mt-2 max-w-2xl text-white/65">
+                Un message clair avec ton contexte (projet / besoin / delai) et je te reponds au plus vite.
+              </p>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="grid gap-4">
+                <a
+                  href="tel:+33615952855"
+                  className="group rounded-[24px] border border-white/10 bg-black/20 p-5 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">Telephone</p>
+                      <p className="mt-2 text-xl font-semibold text-white">06 15 95 28 55</p>
+                      <p className="mt-2 text-sm text-white/60">Cliquer pour appeler.</p>
+                    </div>
+                    <span className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-red-200/85">
+                      Appel
+                    </span>
+                  </div>
+                </a>
+
+                <a
+                  href="mailto:william.nehar2007@gmail.com"
+                  className="group rounded-[24px] border border-white/10 bg-black/20 p-5 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">Email</p>
+                      <p className="mt-2 text-xl font-semibold text-white break-all">william.nehar2007@gmail.com</p>
+                      <p className="mt-2 text-sm text-white/60">Cliquer pour envoyer un mail.</p>
+                    </div>
+                    <span className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-red-200/85">
+                      Mail
+                    </span>
+                  </div>
+                </a>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <a
+                    href="https://www.instagram.com/wbigz95/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group rounded-[24px] border border-white/10 bg-black/20 p-5 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+                  >
+                    <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">Instagram</p>
+                    <p className="mt-2 text-lg font-semibold text-white">@wbigz95</p>
+                    <p className="mt-2 text-sm text-white/60">Ouvrir le profil.</p>
+                  </a>
+
+                  <a
+                    href="https://www.linkedin.com/in/william-nehar-73a528382"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group rounded-[24px] border border-white/10 bg-black/20 p-5 transition hover:border-red-400/35 hover:bg-white/[0.05]"
+                  >
+                    <p className="text-[11px] uppercase tracking-[0.26em] text-white/45">LinkedIn</p>
+                    <p className="mt-2 text-lg font-semibold text-white">/in/william-nehar-73a528382</p>
+                    <p className="mt-2 text-sm text-white/60">Ouvrir le profil.</p>
+                  </a>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-red-300/75">Snapchat</p>
+                  <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Pseudo</p>
+                    <p className="mt-1 text-base font-semibold text-white">willi.953</p>
+                  </div>
+                  <p className="mt-3 text-sm text-white/60">Ajoute le pseudo directement sur Snapchat.</p>
+                </div>
+              </div>
+            </div>
+          </div>
         ),
       },
     } satisfies Record<TargetKey, { title: string; body: React.ReactNode }>;
